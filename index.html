@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sound Similarity</title>
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <link href="./assets/css/app.css" rel="stylesheet" type="text/css">
+    <link href="./assets/css/install-button.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="./assets/js/jquery.min.js"></script>
+    <script src="./assets/js/bootstrap.min.js"></script>
+    <script src="./assets/js/meyda.min.js"></script>
+    <script src="./assets/js/math.min.js"></script>
+    <script src="./assets/js/d3.v4.min.js"></script>
+    <script src="./assets/js/p5/p5.js"></script>
+    <script src="./assets/js/p5/addons/p5.dom.js"></script>
+
+</head>
+<script src="./assets/js/tSNE_Scatterplot.js"></script>
+<script src="smithwaterman.js"></script>
+<script src="tsne_worker.js"></script>
+<script src="main.js"></script>
+<body>
+<div>
+    <div class=".jumbotron" id="header">
+        Sound Visualization
+    </div>
+
+    <div class=".container-fluid">
+        <div class="row">
+            <div id="loader"></div>
+            <div id="buttons">
+                <div class="btn btn-primary">
+                    <input type="file" id="filepicker" accept=".mp3,.wav,.ogg" name="fileList" multiple/>
+                </div>
+                <button type="button" class="btn btn-primary" id="record" onclick=startrecord()>Record</button>
+                <button type="button" class="btn btn-primary" onclick=stopStream()>Stop</button>
+                <button type="button" class="btn btn-primary" onclick="draw_shortestpath()">Calculate MST</button>
+                <button type="button" class="btn btn-primary" onclick=" draw_graph()">Draw Graph</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4 well">
+                <div class="form">Audio's Length
+                    <input type=number value=4 id="duration"><br>
+                </div>
+            </div>
+
+            <div class="col-sm-4 well">
+                <div class="slidecontainer_perplexity">
+
+                    <input type="range" min="1" max="100" value="5" class="slider" id="myRange1" oninput="perplexity_output.value = myRange1.value"> Perplexity
+                    <output name="Output1" id="perplexity_output">5</output>
+
+                </div>
+            </div>
+            <div class="col-sm-4 well">
+                <div class="slidecontainer_iteration">
+                    <input type="range" min="100" max="5000" value="100" class="slider" id="myRange2" oninput="iteration_output.value = myRange2.value"> Iterations
+                    <output name="Output2" id="iteration_output">100</output>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-12 well" id="live_canvas">
+                <div class="span">13 MFCC Heatmap</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8" id="theGraph">
+
+            <div class="span">T-SNE Output Scatterplot</div>
+
+<!--            <div id="textDiv" class="col-md-4"></div>-->
+<!--            <div class="span" id="score"></div>-->
+<!--            <div class="col-md-8">-->
+
+<!--                <canvas id="compareCanvas"></canvas>-->
+<!--            </div>-->
+        </div>
+        <div class="col-md-4" id="tooltip_all">
+
+            <div class="row">
+                <div class="span">Sample's Euclidean Distance Comparision</div>
+                <div id="tooltip_line" width="500" height="300">
+
+                </div>
+            </div>
+            <div class="row">
+
+                <canvas id="tooltip_radar" width="200" height="200">
+                </canvas>
+
+
+                <canvas id="tooltip_radar_compare" width="200" height="200">
+                </canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="position: relative; height:300px; width:300px">
+        <canvas id="marksChart" height="200px" width="200px"></canvas>
+        <canvas id="myCanvas" height="300px" width="300px"></canvas>
+    </div>
+
+</div>
+</div>
+</body>
+</html>

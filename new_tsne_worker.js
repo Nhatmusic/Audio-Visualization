@@ -80,13 +80,12 @@ self.onmessage = function (e) {
             for (let i = 0; i < 500; i++)
             {
                 tsne.step();
-                // console.log(tsne.step());
                 step_tsne = tsne.getSolution();
-                // console.log(step_tsne);
-                postMessage({
-                    message: 'DrawUpdate',
-                    value: step_tsne
-                });
+                    postMessage({
+                        message: 'DrawUpdate',
+                        value: step_tsne
+                    });
+
             }
 
             store_tsne_solution = tsne.getSolution();

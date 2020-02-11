@@ -73,6 +73,21 @@ function Update_Tsne_node(data) {
             .attr('width', 60)
             .attr('height', 60)
             .on('mouseover', function (d) {
+                noLoop();
+                for(let i = 0; i < mfcc_data_all[d.id].length; i++ ) {
+                    for (let j = 0; j < mfcc_data_all[d.id][i].length; j++) {
+                        let color_strength = mfcc_data_all[d.id][i][j] * 100
+
+                        // setting color
+                        if (mfcc_data_all[d.id] [i] [j] >= 0)
+                            fill(0, color_strength, 0)
+                        else
+                            fill(0, 0, -color_strength)
+                        // noStroke();
+                        //drawing the rectangle
+                        rect(i * BOX_WIDTH * 2, j * BOX_HEIGHT * 2, BOX_WIDTH * 2, BOX_HEIGHT * 2)
+                    }
+                }
                 PlayAudio(this, d);
                 d3.select(this)
                     .attr("width", 100)
@@ -100,6 +115,7 @@ function Update_Tsne_node(data) {
             .attr('r', 5)
             .style("fill", 'blue')
             .on('mouseover', function (d) {
+
                 PlayAudio(this, d);
                 d3.select(this)
                     .attr("width", 100)
@@ -127,5 +143,6 @@ function UpdateDataTSNE(data) {
         store_process_tsne_data[i].y = d[1];  // Add the t-SNE y result to the dataset
         store_process_tsne_data[i].image_canvas=store_image_in_canvas[i];
         store_process_tsne_data[i].url = fileContent[i];
+        store_process_tsne_data[i].id = i;
     });
 }

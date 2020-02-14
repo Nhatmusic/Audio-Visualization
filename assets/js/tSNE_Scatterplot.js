@@ -91,7 +91,26 @@ function Update_Tsne_node(data) {
                 PlayAudio(this, d);
                 d3.select(this)
                     .attr("width", 100)
-                    .attr("height", 100)
+                    .attr("height", 100);
+
+                svg_scatterplot.append("g")
+                    .attr("class", "rowLabels")
+                    .selectAll(".rowLabel")
+                    .data(data)
+                    .enter().append("text")
+                    .text(function (rowLabel) {
+                        return rowLabel.label;
+                    })
+                    .attr("class",function (d,i) {
+                        return "text"+i
+                    })
+                    .attr("x", function (d) {return xScale(d.x)-30 })
+                    .attr("y", function (d) {return yScale(d.y)-30 })
+                    .style("text-anchor", "middle")
+                    .style("font-size", "10px")
+                    .attr("transform", function (rowLabel) {
+                        return `translate(80, ${60})`;
+                    })
             })
             .on('mouseout', function (d) {
                 d3.select(this)
@@ -144,5 +163,6 @@ function UpdateDataTSNE(data) {
         store_process_tsne_data[i].image_canvas=store_image_in_canvas[i];
         store_process_tsne_data[i].url = fileContent[i];
         store_process_tsne_data[i].id = i;
+        store_process_tsne_data[i].lable = audio_label[i];
     });
 }

@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="497b5d7f-4cea-4f0d-8663-c707659d5d93" name="Default Changelist" comment="" />
+    <list default="true" id="497b5d7f-4cea-4f0d-8663-c707659d5d93" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/js/tSNE_Scatterplot.js" beforeDir="false" afterPath="$PROJECT_DIR$/assets/js/tSNE_Scatterplot.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -80,7 +83,8 @@
       <workItem from="1581442985224" duration="606000" />
       <workItem from="1581567499448" duration="599000" />
       <workItem from="1581655412940" duration="601000" />
-      <workItem from="1581697097903" duration="1214000" />
+      <workItem from="1581697097903" duration="2550000" />
+      <workItem from="1581699874846" duration="251000" />
     </task>
     <servers />
   </component>

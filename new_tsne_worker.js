@@ -77,7 +77,7 @@ self.onmessage = function (e) {
             // firstUpdate = false;
             //if there are more than 2 samples, we update the data only, does not re-generate random position in low dimension
             tsne.updateData(msg.value);
-            for (let i = 0; i < 500; i++)
+            for (let i = 0; i < 100; i++)
             {
                 tsne.step();
                 step_tsne = tsne.getSolution();

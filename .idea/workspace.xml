@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="497b5d7f-4cea-4f0d-8663-c707659d5d93" name="Default Changelist" comment="" />
+    <list default="true" id="497b5d7f-4cea-4f0d-8663-c707659d5d93" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/new_tsne_worker.js" beforeDir="false" afterPath="$PROJECT_DIR$/new_tsne_worker.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -77,6 +80,10 @@
       <workItem from="1580740590714" duration="633000" />
       <workItem from="1581285462383" duration="17499000" />
       <workItem from="1581397618748" duration="8952000" />
+      <workItem from="1581442985224" duration="606000" />
+      <workItem from="1581567499448" duration="599000" />
+      <workItem from="1581655412940" duration="601000" />
+      <workItem from="1581697097903" duration="945000" />
     </task>
     <servers />
   </component>

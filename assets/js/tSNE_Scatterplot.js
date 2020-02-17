@@ -55,10 +55,23 @@ function Update_Tsne_node(data) {
     selection.exit().remove();
     //Enter
     if (firstdraw == false) {
-        scatterplot.selectAll('circle').remove();
+      if(record==true) {
+          scatterplot.selectAll('circle').remove();
+      }
+
         selection = scatterplot.selectAll(".compute").data(data);
         //Exit
         selection.exit().remove();
+        scatterplot.selectAll('text').remove();
+        selection.enter().append("text")
+            .text(function (d) {
+                return d.lable;
+            })
+            .attr("class", (d) => "text" + d.id)
+            .attr("x", function (d) {return xScale(d.x) })
+            .attr("y", function (d) {return yScale(d.y) })
+            .style("text-anchor", "middle")
+            .style("font-size", "10px");
          selection.enter().append('svg:image')
             .attr('xlink:href', function (d) {
                 return d.image_canvas;
@@ -70,8 +83,8 @@ function Update_Tsne_node(data) {
                 return (yScale(d.y));
             })
             .attr("class", "imagee")
-            .attr('width', 60)
-            .attr('height', 60)
+            .attr('width', 10)
+            .attr('height', 10)
             .on('mouseover', function (d) {
                 noLoop();
                 for(let i = 0; i < mfcc_data_all[d.id].length; i++ ) {
@@ -90,65 +103,106 @@ function Update_Tsne_node(data) {
                 }
                 PlayAudio(this, d);
                 d3.select(this)
-                    .attr("width", 100)
-                    .attr("height", 100);
+                    .attr("width", 50)
+                    .attr("height", 50);
+                d3.selectAll('text').style("opacity",0);
 
-                svg_scatterplot.append("g")
-                    .attr("class", "rowLabels")
-                    .selectAll(".rowLabel")
-                    .data(data)
-                    .enter().append("text")
-                    .text(function (rowLabel) {
-                        return rowLabel.label;
-                    })
-                    .attr("class",function (d,i) {
-                        return "text"+i
-                    })
-                    .attr("x", function (d) {return xScale(d.x)-30 })
-                    .attr("y", function (d) {return yScale(d.y)-30 })
-                    .style("text-anchor", "middle")
-                    .style("font-size", "10px")
-                    .attr("transform", function (rowLabel) {
-                        return `translate(80, ${60})`;
-                    })
+                d3.select(".text"+ d.id).style("font-size", "20px").style("opacity",1);
+
             })
             .on('mouseout', function (d) {
                 d3.select(this)
-                    .attr("width", 60)
-                    .attr("height", 60)
+                    .attr("width", 10)
+                    .attr("height", 10)
+                d3.select(".text"+ d.id).style("opacity",1).style("font-size", "10px");
+                d3.selectAll('text').style("opacity",1);
             });
+
         //Update
         selection
             .attr("x", d => (xScale(d.x)))
             .attr("y", d=> (yScale(d.y)))
+
+
+            // .on('mouseover', function (d) {
+            //
+            //     PlayAudio(this, d);
+            //     d3.select(this)
+            //         .attr("width", 100)
+            //         .attr("height", 100)
+            // })
+            // .on('mouseout', function (d) {
+            //     d3.select(this)
+            //         .attr("width", 60)
+            //         .attr("height", 60)
+            // });
+
+        // scatterplot.selectAll(".texte").data(store_process_tsne_data)
+        //     .text(function (d) {
+        //         return d.lable;
+        //     })
+        //     // .attr("class","text" + d.id)
+        //     .attr("x", d => (xScale(d.x)))
+        //     .attr("y", d=> (yScale(d.y)));
     }
     else {
-        selection.enter().append('circle')
-            .attr('cx', function (d) {
-                return (xScale(d.x));
-            })
-            .attr('cy', function (d) {
-                return (yScale(d.y));
-            })
-            .attr("class", "compute")
-            .attr('r', 5)
-            .style("fill", 'blue')
-            .on('mouseover', function (d) {
+        if (record == true) {
+            selection.enter().append('circle')
+                .attr('cx', function (d) {
+                    return (xScale(d.x));
+                })
+                .attr('cy', function (d) {
+                    return (yScale(d.y));
+                })
+                .attr("class", "compute")
+                .attr('r', 5)
+                .style("fill", 'blue')
+                .on('mouseover', function (d) {
 
-                PlayAudio(this, d);
-                d3.select(this)
-                    .attr("width", 100)
-                    .attr("height", 100)
-            })
-            .on('mouseout', function (d) {
-                d3.select(this)
-                    .attr("width", 60)
-                    .attr("height", 60)
-            });
-        //Update
-        selection
-            .attr("cx", d => (xScale(d.x)))
-            .attr("cy", d=> (yScale(d.y)))
+                    PlayAudio(this, d);
+                    d3.select(this)
+                        .attr("width", 100)
+                        .attr("height", 100)
+                })
+                .on('mouseout', function (d) {
+                    d3.select(this)
+                        .attr("width", 60)
+                        .attr("height", 60)
+                });
+            //Update
+            selection
+                .attr("cx", d => (xScale(d.x)))
+                .attr("cy", d=> (yScale(d.y)))
+        }
+        else {
+            selection.enter().append("text")
+                .text(function (d) {
+                    return d.lable;
+                })
+                .attr("class", "texte")
+                .attr("x", function (d) {return xScale(d.x) })
+                .attr("y", function (d) {return yScale(d.y) })
+                .style("text-anchor", "middle")
+                .style("font-size", "10px")
+                .on('mouseover', function (d) {
+
+                    PlayAudio(this, d);
+                    d3.select(this)
+                        .attr("width", 100)
+                        .attr("height", 100)
+                })
+                .on('mouseout', function (d) {
+                    d3.select(this)
+                        .attr("width", 60)
+                        .attr("height", 60)
+                });
+            //Update
+            selection
+                .attr("x", d => (xScale(d.x)))
+                .attr("y", d=> (yScale(d.y)))
+        }
+
+
 
     }
 

@@ -13,6 +13,7 @@ let fakeDataforfirstplot = [];
 let store_image_in_canvas = [];
 let output_tsne;
 let firstdraw = true;
+var record = false;
 
 let tsne_config = {
     opt: {
@@ -35,14 +36,15 @@ window.onload = function () {
     d3.select("#loader").style("display", "none");
     document.getElementById("filepicker").addEventListener("change", function (event) {
         let files = event.target.files;
-        console.log(files);
+        // console.log(files);
         for (i = 0; i < files.length; i++) {
             audio_label.push(files[i].name.split('_').slice(0, 2).join("_"));
             fileContent.push(URL.createObjectURL(files[i]));
+            fakeDataforfirstplot.push([0]);
         }
-        fakeDataforfirstplot = Array(fileContent.length).fill([0]);
+        // fakeDataforfirstplot = Array(fileContent.length).fill([0]);
         fakeDataforFirstScatterplot();
-        tsne_worker = new Worker('new_tsne_worker.js');
+        // tsne_worker = new Worker('new_tsne_worker.js');
         //getData function was called recursively to
         get_mfcc_data(fileContent[0], 0);
     }, false);
@@ -77,10 +79,8 @@ function setup() {
     draw_ssm_worker = new Worker('drawssm.js');
     tsne_data_worker = new Worker('process_tsne_data.js');
     tsne_worker = new Worker('new_tsne_worker.js');
+
     //initiate scatter plot for tsne
-
-
-
     svg_scatterplot = d3.select("#theGraph")
         .append("svg")
         .attr("width", width)
@@ -88,7 +88,7 @@ function setup() {
 
     scatterplot = svg_scatterplot
         .append("g")
-        .attr("transform", `translate(${margin.left}, ${margin.right})`)
+        .attr("transform", `translate(${50}, ${50})`)
         .attr("id", "snodes");
 }
 
@@ -157,87 +157,8 @@ function get_mfcc_data(a, index) {
                 offlineCtx.startRendering();
                 //After complete rendering, performing the following steps
                 offlineCtx.oncomplete = function (e) {
-                    //copy the data generated from Meyda Analyzer 1
-
-                    var store_each_sound_mfcc = [];
-                    //mfcc_data is generated from function show1 of Meyda Analyzer 1 of each sound samples
-                    store_each_sound_mfcc = mfcc_data;
-
-                    //mfcc_data_all contains all the mfcc features of all sound samples
-                    mfcc_data_all.push(store_each_sound_mfcc);
-                    //draw first scatter plot for all sound sample
-                    // fakeDataforFirstScatterplot();
-                    draw_ssm_worker.postMessage({
-                        data: store_each_sound_mfcc
-                    });
-                    tsne_data_worker.postMessage({
-                        data: store_each_sound_mfcc
-                    })
-                    draw_ssm_worker.onmessage = function(e){
-                        var msg = e.data;
-                        store_image_in_canvas.push(drawmatrix(msg.data));
-                    }
-
-
-                    tsne_data_worker.onmessage = function(e) {
-                        var msg = e.data;
-                                store_process_tsne_data.push(msg.value);
-
-                              if (store_process_tsne_data.length == 2) {
-                                  tsne_worker.postMessage({message: 'initTSNE', value: tsne_config.opt});
-                              }
-                              if (store_process_tsne_data.length > 2) {
-                                  tsne_worker.postMessage({
-                                      message: 'DataReady',
-                                  });
-                              }
-
-                        }
-
-                    tsne_worker.onmessage = function(e) {
-                        var msg = e.data;
-
-                        switch (msg.message){
-                            case 'BUSY':
-                                console.log('Iam busy');
-                                break;
-                            case 'READY':
-                                tsne_worker.postMessage({
-                                    message: 'RUN',
-                                    value: store_process_tsne_data.slice(0, 2)
-                                });
-                                break;
-                            case 'Update':
-                                if(store_process_tsne_data.length>msg.index) {
-                                    console.log(msg.index);
-                                    tsne_worker.postMessage({
-                                        message: 'UpdateData',
-                                        value: store_process_tsne_data.slice(0, msg.index + 1)
-                                    })
-                                }
-                                console.log('hehe'+msg.index);
-                                console.log('haha' +store_process_tsne_data.length);
-                            output_tsne = msg.value;
-                                if (fileContent.length ==  msg.index){
-                                    tsne_worker.postMessage({
-                                        message: 'Done'
-                                    })
-                                }
-                                break;
-                            case 'DrawUpdate':
-                                drawscatterplot(msg.value);
-                                break;
-                            case 'Done':
-                                firstdraw = false;
-                                drawscatterplot(msg.value);
-                            default:
-                                break;
-
-                        }
-                    }
-
-
-                    mfcc_data = [];
+                    //call function to start process when mfcc data is available
+                    all_worker_process();
                     //Create self_similarity data based on origin_data by calculate Euclidean distance between each pair of data point of origin_data
                     ++index;
                     console.log("loading"+index)
@@ -263,7 +184,135 @@ function get_mfcc_data(a, index) {
     return 0;
 }
 
+function all_worker_process(){
 
+    var store_each_sound_mfcc = [];
+    //mfcc_data is generated from function show1 of Meyda Analyzer 1 of each sound samples
+    store_each_sound_mfcc = mfcc_data;
+    console.log(store_each_sound_mfcc);
+    //mfcc_data_all contains all the mfcc features of all sound samples
+    mfcc_data_all.push(store_each_sound_mfcc);
+
+    draw_ssm_worker.postMessage({
+        data: store_each_sound_mfcc
+    });
+    tsne_data_worker.postMessage({
+        data: store_each_sound_mfcc
+    })
+    draw_ssm_worker.onmessage = function(e){
+        var msg = e.data;
+
+        switch (msg.message) {
+            case 'BUSY':
+                // console.log("draw_ssm is busy");
+                break;
+            case 'READY':
+                // console.log("draw_ssm is ready");
+                store_image_in_canvas.push(drawmatrix(msg.data));
+                draw_ssm_worker.postMessage({
+                    data: store_each_sound_mfcc
+                });
+                break;
+            default:
+                break;
+        }
+    }
+
+
+    tsne_data_worker.onmessage = function(e) {
+        var msg = e.data;
+
+        switch (msg.message) {
+            case 'BUSY':
+                // console.log('tsne_data_worker is busy');
+                break;
+            case 'READY':
+                // console.log('tsne_data_worker is ready');
+                store_process_tsne_data.push(msg.value);
+            if (store_process_tsne_data.length == 2)
+            {
+                tsne_worker.postMessage({message: 'initTSNE', value: tsne_config.opt});
+            }
+            if (store_process_tsne_data.length > 2) {
+                    tsne_worker.postMessage({
+                        message: 'DataReady',
+                    });
+            }
+            break;
+            default:
+                break;
+        }
+    }
+
+    tsne_worker.onmessage = function(e) {
+        var msg = e.data;
+
+        switch (msg.message){
+            case 'BUSY':
+                // console.log('Iam busy');
+                break;
+            case 'READY':
+                tsne_worker.postMessage({
+                    message: 'RUN',
+                    value: store_process_tsne_data.slice(0, 2)
+                });
+                break;
+            case 'Update':
+                if(store_process_tsne_data.length>msg.index) {
+                    // console.log(msg.index);
+                    tsne_worker.postMessage({
+                        message: 'UpdateData',
+                        value: store_process_tsne_data.slice(0, msg.index + 1)
+                    })
+                }
+                output_tsne = msg.value;
+                if (fileContent.length ==  msg.index || (store_process_tsne_data.length ==  parseInt($('#duration').val()*5, 10)&& record == true) ){
+                    tsne_worker.postMessage({
+                        message: 'Done'
+                    })
+                }
+                break;
+            case 'DrawUpdate':
+
+                UpdateDataTSNE(msg.value);
+                // debugger
+                // Draw_Scatterplot(store_process_tsne_data);
+                xScale = d3.scaleLinear()
+                    .domain(d3.extent(msg.value.flat()))
+                    .range([0, contentWidth]);
+                yScale = d3.scaleLinear()
+                    .domain(d3.extent(msg.value.flat()))
+                    .range([0, contentHeight]);
+                if (record == true){
+                    scatterplot.selectAll(".compute").data(store_process_tsne_data)
+                        .attr("cx", d => (xScale(d.x)))
+                        .attr("cy", d=> (yScale(d.y)));
+                }
+                else {
+                    scatterplot.selectAll(".texte").data(store_process_tsne_data)
+                        .text(function (d) {
+                            return d.lable;
+                        })
+                        .attr("x", d => (xScale(d.x)))
+                        .attr("y", d => (yScale(d.y)));
+                }
+                break;
+            case 'Done':
+                if (record == true) {
+                    stopStream();
+                    tsne_worker.terminate();
+                }
+                firstdraw = false;
+                drawscatterplot(msg.value);
+
+
+            default:
+                break;
+
+        }
+    }
+    mfcc_data = [];
+}
 
 
 //function callback of Meyda Analyzer 1 which calculate mfcc coefficient
@@ -273,6 +322,9 @@ function mfcc_extract(features) {
     //mfcc data contains all the mfcc feature extracted from sound in time series
     if (rms > 0) {
         mfcc_data.push(mfcc)
+    }
+    if(record == true & mfcc_data.length % 40 == 0 & mfcc_data.length>0){
+            all_worker_process()
     }
 }
 
@@ -303,7 +355,10 @@ function drawmatrix(self_similarity_data) {
     }
 
     var c = document.getElementById("myCanvas");
+    c.style.visibility = "hidden";
     var ctx = c.getContext("2d");
+    ctx.canvas.width = self_similarity_data.length;
+    ctx.canvas.height = self_similarity_data.length;
 
     // define the size of image
     var imgData = ctx.createImageData(color_data[0].length, color_data.length);
@@ -325,7 +380,7 @@ function drawmatrix(self_similarity_data) {
     //save canvas to png image then call back to use in network diagram
     var imagedata = c.toDataURL("image/png");
     return imagedata;
-    console.log("I am calculating the distance");
+    // console.log("I am calculating the distance");
 }
 
 
@@ -356,8 +411,9 @@ function plot(data){
 function fakeDataforFirstScatterplot() {
 
     fakeDataforfirstplot.forEach(function(d, i) {
-        fakeDataforfirstplot[i].x = d[0];  // Add the t-SNE x result to the dataset
-        fakeDataforfirstplot[i].y = d[0];  // Add the t-SNE y result to the dataset
+        fakeDataforfirstplot[i].x = 0;  // Add the t-SNE x result to the dataset
+        fakeDataforfirstplot[i].y = 0;  // Add the t-SNE y result to the dataset
+        fakeDataforfirstplot[i].lable = audio_label[i];
 
     });
 
@@ -365,3 +421,71 @@ function fakeDataforFirstScatterplot() {
 
 }
 
+//live audio recording, create microphone audio input source from audio context
+function createMicSrcFrom(audioCtx){
+    /* get microphone access */
+    return new Promise((resolve, reject)=> {
+        /* only audio */
+        let constraints = {audio: true, video: false}
+        record = true;
+        for (var i = 0; i < parseInt($('#duration').val() * 5); i++){
+            fakeDataforfirstplot.push([0]);
+    }
+        fakeDataforFirstScatterplot();
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then((stream)=>{
+                window.streamReference = stream;
+                /* create source from
+                microphone input stream */
+                let src = audioCtx.createMediaStreamSource(stream);
+                resolve(src);
+                // console.log(src);
+            }).catch((err)=>{reject(err)})
+    })
+
+}
+
+function stopStream() {
+    analyzer.stop();
+    if (!window.streamReference) return;
+    window.streamReference.getAudioTracks().forEach(function(track) {
+        track.stop();
+    });
+    window.streamReference = null;
+}
+
+function onMicDataCall(features, callback){
+    return new Promise((resolve, reject)=>{
+        var audioCtx = new AudioContext();
+        createMicSrcFrom(audioCtx)
+            .then((src) => {
+                // console.log(audioCtx.createBufferSource());
+                analyzer = Meyda.createMeydaAnalyzer({
+                    'audioContext': audioCtx,
+                    'source':src,
+                    'bufferSize':1024,
+                    'melBands': 26,
+                    'sampleRate': 44100,
+                    'hopSize': 1024,
+                    'featureExtractors':features,
+                    'callback':callback
+                })
+                resolve(analyzer)
+            }).catch((err)=>{
+            reject(err)
+        })
+    })
+}
+function startrecord() {
+    // worker2 = new Worker('drawssm.js');
+    loop();
+    mfcc_history=[];
+    //create meyda analyzer and connect to mic source
+    onMicDataCall([featureType, featureType2], mfcc_extract)
+        .then((meydaAnalyzer) => {
+            meydaAnalyzer.start()
+        }).catch((err)=>{
+        alert(err)
+    })
+
+}

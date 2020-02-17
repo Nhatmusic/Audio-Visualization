@@ -199,7 +199,7 @@
 
     var tSNE = function(opt) {
         var opt = opt || {};
-        this.perplexity = getopt(opt, "perplexity", 30); // effective number of nearest neighbors
+        this.perplexity = getopt(opt, "perplexity", 20); // effective number of nearest neighbors
         this.dim = getopt(opt, "dim", 2); // by default 2-D tSNE
         this.epsilon = getopt(opt, "epsilon", 10); // learning rate
         this.maxtries = getopt(opt, "maxtries", 50); //
@@ -263,9 +263,10 @@
             // this.initSolution();
             // this.Y = randn2d(this.N, this.dim);
             this.Y.push([0.00001,0.00001]);
-            this.gains = randn2d(this.N, this.dim, 1.0); // step gains to accelerate progress in unchanging directions
-            this.ystep = randn2d(this.N, this.dim, 0.0); //momentum accumulator
-            this.iter = 0; // reset iter
+            this.gains.push([0.00001,0.00001]); // step gains to accelerate progress in unchanging directions
+            this.ystep.push([0.00001,0.00001]); //momentum accumulator
+            // this.iter = 0; // reset iter
+            // console.log(this);
             // this.initSolution(); // refresh this
         },
         // return pointer to current solution
@@ -320,8 +321,9 @@
                     this.Y[i][d] -= ymean[d]/N;
                 }
             }
-
+            // console.log(this.ystep);
             //if(this.iter%100===0) console.log('iter ' + this.iter + ', cost: ' + cost);
+
             return cost; // return current cost
         },
 
@@ -396,7 +398,7 @@
                 }
                 grad.push(gsum);
             }
-
+            // console.log(grad);
             return {cost: cost, grad: grad};
         }
     }

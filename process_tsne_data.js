@@ -4,15 +4,33 @@ importScripts("./assets/js/underscore.js");
 importScripts("./assets/js/d3.v4.min.js");
 importScripts("./assets/js/numjs.min.js");
 var total_process_tsne_data = [];
+//function return a postMessage which show the status of worker
+function isBusy () {
+    postMessage({
+        type: 'STATUS',
+        data: 'BUSY'
+    });
+}
+
+//function return a postMessage which show the status of worker
+function isReady () {
+    postMessage({
+        type: 'STATUS',
+        data: 'READY'
+    });
+}
 
 
 //function inside onmessage will be called when worker receives data or message
 self.onmessage = function (e) {
+    isBusy();
     var datadraw=e.data;
     total_process_tsne_data.push(data_preprocess(datadraw.data));
     postMessage({
-        value: data_preprocess(datadraw.data)
+        value: data_preprocess(datadraw.data),
+        message: 'READY'
     })
+    // isReady();
 }
 
 function data_preprocess(origin_data){

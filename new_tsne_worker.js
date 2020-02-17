@@ -24,16 +24,19 @@ let tsne;
 // var isUpdate = false;
 let store_tsne_solution;
 let index;
-let step_tsne;
+
 let store_tsne_stage_solution;
+let count_step;
 //function inside onmessage will be called when worker receives data or message
 self.onmessage = function (e) {
 
     //get data pass to worker when it is called
     var msg = e.data;
+    var step_tsne;
     // console.log(msg);
 //case statement depends on the type of message pass to worker
     switch (msg.message) {
+
         //if message type is 'input data' then initial the T_sne model
         case 'initTSNE':
             // isBusy();
@@ -74,22 +77,20 @@ self.onmessage = function (e) {
             break;
 
         case'UpdateData':
-            // firstUpdate = false;
             //if there are more than 2 samples, we update the data only, does not re-generate random position in low dimension
             tsne.updateData(msg.value);
-            for (let i = 0; i < 100; i++)
+            for (let i = 0; i < 500; i++)
             {
                 tsne.step();
                 step_tsne = tsne.getSolution();
+                // console.log(step_tsne.flat());
                     postMessage({
                         message: 'DrawUpdate',
                         value: step_tsne
                     });
 
             }
-
             store_tsne_solution = tsne.getSolution();
-
                 postMessage({
                     message: 'Update',
                     value: store_tsne_solution,
@@ -101,9 +102,7 @@ self.onmessage = function (e) {
             for (let i = 0; i < 500; i++)
             {
                 tsne.step();
-                // console.log(tsne.step());
                 step_tsne = tsne.getSolution();
-                // console.log(step_tsne);
                 postMessage({
                     message: 'DrawUpdate',
                     value: step_tsne
@@ -114,6 +113,7 @@ self.onmessage = function (e) {
                     value: store_tsne_solution,
                     index: store_tsne_solution.length
                 });
+
         default:
 
     }

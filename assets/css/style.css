@@ -100,7 +100,7 @@ input#filepicker {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    background: url('https://cdn1.iconfinder.com/data/icons/hawcons/32/698394-icon-130-cloud-upload-512.png') center center no-repeat #e4e4e4;
+    background: url('https://img.icons8.com/cotton/64/000000/upload.png') center center no-repeat #e4e4e4;
     border-radius: 20px;
     background-size: 60px 60px;
 }
@@ -323,4 +323,18 @@ input#filepicker {
     top: 265px;
 }
 
+.svg-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+    vertical-align: top;
+    overflow: hidden;
+}
+.svg-content {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
 

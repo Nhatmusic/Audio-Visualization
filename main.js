@@ -13,8 +13,8 @@ let fakeDataforfirstplot = [];
 let store_image_in_canvas = [];
 let output_tsne;
 let firstdraw = true;
-var record = false;
-
+var Isrecord = false;
+let audioChunks = [];
 let tsne_config = {
     opt: {
         epsilon: 10, // epsilon is learning rate (10 = default)
@@ -38,7 +38,8 @@ window.onload = function () {
         let files = event.target.files;
         // console.log(files);
         for (i = 0; i < files.length; i++) {
-            audio_label.push(files[i].name.split('_').slice(0, 2).join("_"));
+            // audio_label.push(files[i].name.split('_').slice(0, 2).join("_"));
+            audio_label.push(files[i].name);
             fileContent.push(URL.createObjectURL(files[i]));
             fakeDataforfirstplot.push([0]);
         }
@@ -64,7 +65,7 @@ Audio.prototype.stop = function () {
     // Reset the playback time marker
     this.currentTime = 0;
 };
-let width = 900, height = 450,
+let width = 1600, height = 600,
     margin = {left: 50, top: 50, right: 50, bottom: 50},
     contentWidth = width - margin.left - margin.right,
     contentHeight = height - margin.top - margin.bottom;
@@ -185,14 +186,12 @@ function get_mfcc_data(a, index) {
 }
 
 function all_worker_process(){
-
     var store_each_sound_mfcc = [];
     //mfcc_data is generated from function show1 of Meyda Analyzer 1 of each sound samples
     store_each_sound_mfcc = mfcc_data;
-    console.log(store_each_sound_mfcc);
+    // console.log(store_each_sound_mfcc);
     //mfcc_data_all contains all the mfcc features of all sound samples
     mfcc_data_all.push(store_each_sound_mfcc);
-
     draw_ssm_worker.postMessage({
         data: store_each_sound_mfcc
     });
@@ -229,6 +228,7 @@ function all_worker_process(){
             case 'READY':
                 // console.log('tsne_data_worker is ready');
                 store_process_tsne_data.push(msg.value);
+                console.log("process" + "" + store_process_tsne_data.length);
             if (store_process_tsne_data.length == 2)
             {
                 tsne_worker.postMessage({message: 'initTSNE', value: tsne_config.opt});
@@ -258,38 +258,37 @@ function all_worker_process(){
                 });
                 break;
             case 'Update':
-                if(store_process_tsne_data.length>msg.index) {
+                if(store_process_tsne_data.length>msg.index&&store_process_tsne_data.length <= fileContent.length) {
                     // console.log(msg.index);
                     tsne_worker.postMessage({
                         message: 'UpdateData',
                         value: store_process_tsne_data.slice(0, msg.index + 1)
                     })
                 }
-                output_tsne = msg.value;
-                if (fileContent.length ==  msg.index || (store_process_tsne_data.length ==  parseInt($('#duration').val()*5, 10)&& record == true) ){
+
+                if (fileContent.length ==  msg.index || (store_process_tsne_data.length ==  parseInt($('#duration').val()*5, 10) && Isrecord == true) ){
                     tsne_worker.postMessage({
                         message: 'Done'
                     })
                 }
                 break;
             case 'DrawUpdate':
-
                 UpdateDataTSNE(msg.value);
-                // debugger
-                // Draw_Scatterplot(store_process_tsne_data);
+                console.log("drawing" + "" + msg.value.length);
                 xScale = d3.scaleLinear()
                     .domain(d3.extent(msg.value.flat()))
                     .range([0, contentWidth]);
                 yScale = d3.scaleLinear()
                     .domain(d3.extent(msg.value.flat()))
                     .range([0, contentHeight]);
-                if (record == true){
+
+                if (Isrecord == true){
                     scatterplot.selectAll(".compute").data(store_process_tsne_data)
                         .attr("cx", d => (xScale(d.x)))
                         .attr("cy", d=> (yScale(d.y)));
                 }
                 else {
-                    scatterplot.selectAll(".texte").data(store_process_tsne_data)
+                    scatterplot.selectAll(".texte").data(store_process_tsne_data.slice(0,msg.value.length))
                         .text(function (d) {
                             return d.lable;
                         })
@@ -298,11 +297,17 @@ function all_worker_process(){
                 }
                 break;
             case 'Done':
-                if (record == true) {
+                if (Isrecord == true) {
                     stopStream();
                     tsne_worker.terminate();
                 }
                 firstdraw = false;
+
+                audioChunks.map( d => {
+                    d = new Blob([d],{type:'audio/mpeg-3'});
+                    fileContent.push(URL.createObjectURL(d));
+                })
+
                 drawscatterplot(msg.value);
 
 
@@ -322,8 +327,9 @@ function mfcc_extract(features) {
     //mfcc data contains all the mfcc feature extracted from sound in time series
     if (rms > 0) {
         mfcc_data.push(mfcc)
+
     }
-    if(record == true & mfcc_data.length % 40 == 0 & mfcc_data.length>0){
+    if(Isrecord == true & mfcc_data.length % 40 == 0 & mfcc_data.length>0){
             all_worker_process()
     }
 }
@@ -383,8 +389,6 @@ function drawmatrix(self_similarity_data) {
     // console.log("I am calculating the distance");
 }
 
-
-
 function draw() {
     clear ();
     background ( 220,220,220);
@@ -427,18 +431,31 @@ function createMicSrcFrom(audioCtx){
     return new Promise((resolve, reject)=> {
         /* only audio */
         let constraints = {audio: true, video: false}
-        record = true;
+        Isrecord = true;
         for (var i = 0; i < parseInt($('#duration').val() * 5); i++){
+            fileContent.push([0]);
             fakeDataforfirstplot.push([0]);
     }
         fakeDataforFirstScatterplot();
         navigator.mediaDevices.getUserMedia(constraints)
             .then((stream)=>{
                 window.streamReference = stream;
+
+
                 /* create source from
                 microphone input stream */
                 let src = audioCtx.createMediaStreamSource(stream);
                 resolve(src);
+
+        const rec = new MediaRecorder(stream);
+        rec.start(1000);
+        rec.ondataavailable = e => {
+            audioChunks.push(e.data);
+            // if (rec.state == "inactive") {
+
+
+
+        }
                 // console.log(src);
             }).catch((err)=>{reject(err)})
     })

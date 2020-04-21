@@ -1,6 +1,18 @@
 'use strict';
-
 importScripts('./assets/js/tsne_new.js');
+
+//assign control variable called firstRun
+//define first instance of tsne
+let tsne;
+// var isUpdate = false;
+let store_tsne_solution;
+let index;
+let cost;
+let stop = false;
+let stopCondition =1e-4;
+let store_tsne_stage_solution;
+let count_step;
+let firstRun = true;
 
 
 //function return a postMessage which show the status of worker
@@ -17,16 +29,6 @@ function isReady () {
     });
 }
 
-//assign control variable called firstRun
-let firstRun = true;
-//define first instance of tsne
-let tsne;
-// var isUpdate = false;
-let store_tsne_solution;
-let index;
-
-let store_tsne_stage_solution;
-let count_step;
 //function inside onmessage will be called when worker receives data or message
 self.onmessage = function (e) {
 
@@ -50,7 +52,7 @@ self.onmessage = function (e) {
                 //if firstRun, then there are 2 samples, let tsne run for 10 step and store the position
                 if (firstRun ==  true) {
                     tsne.initDataRaw(msg.value);
-                    for (let i = 0; i < 500; i++)
+                    for (let i = 0; i < 50; i++)
                     {
                         tsne.step();
                         tsne.getSolution();
@@ -58,37 +60,48 @@ self.onmessage = function (e) {
                     }
                     //get the current solution of tsne of the first run
                     store_tsne_solution = tsne.getSolution();
-                    // console.log(store_tsne_solution);
-
                     firstRun = false;
                     console.log('Run tsne')
 
                 }
-        case'DataReady':
-
+        case 'DataReady':
                 index = store_tsne_solution.length;
                 postMessage({
                     message: 'Update',
                     value: store_tsne_solution,
                     index: index
                 });
-                index ++;
+                // index ++;
         // }
             break;
 
         case'UpdateData':
             //if there are more than 2 samples, we update the data only, does not re-generate random position in low dimension
             tsne.updateData(msg.value);
-            for (let i = 0; i < 500; i++)
-            {
-                tsne.step();
+            // for (let i = 0; i < 400; i++)
+            // {
+            //     tsne.step();
+            //     step_tsne = tsne.getSolution();
+            //     if (i%20 == 0) {
+            //         console.log(i);
+            //         postMessage({
+            //             message: 'DrawUpdate',
+            //             value: step_tsne
+            //         });
+            //     }
+            //
+            // }
+            stop = false;
+            for (let i = 0; i < 100 && (!stop); i++) {
+                const cost_old = tsne.step();
+                stop = ((cost_old - cost) < stopCondition) && (cost_old - cost) > 0;
+                cost = cost_old;
                 step_tsne = tsne.getSolution();
-                // console.log(step_tsne.flat());
-                    postMessage({
-                        message: 'DrawUpdate',
-                        value: step_tsne
-                    });
-
+                // console.log(step_tsne);
+                postMessage({
+                                message: 'DrawUpdate',
+                                value: step_tsne
+                            });
             }
             store_tsne_solution = tsne.getSolution();
                 postMessage({

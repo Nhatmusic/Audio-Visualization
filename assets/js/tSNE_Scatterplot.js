@@ -1,6 +1,4 @@
 
-
-
 function PlayAudio(thisElement, d) {
     // Play audio on click
     let audioElement;
@@ -55,10 +53,9 @@ function Update_Tsne_node(data) {
     selection.exit().remove();
     //Enter
     if (firstdraw == false) {
-      if(record==true) {
+      if(Isrecord==true) {
           scatterplot.selectAll('circle').remove();
       }
-
         selection = scatterplot.selectAll(".compute").data(data);
         //Exit
         selection.exit().remove();
@@ -122,31 +119,9 @@ function Update_Tsne_node(data) {
         selection
             .attr("x", d => (xScale(d.x)))
             .attr("y", d=> (yScale(d.y)))
-
-
-            // .on('mouseover', function (d) {
-            //
-            //     PlayAudio(this, d);
-            //     d3.select(this)
-            //         .attr("width", 100)
-            //         .attr("height", 100)
-            // })
-            // .on('mouseout', function (d) {
-            //     d3.select(this)
-            //         .attr("width", 60)
-            //         .attr("height", 60)
-            // });
-
-        // scatterplot.selectAll(".texte").data(store_process_tsne_data)
-        //     .text(function (d) {
-        //         return d.lable;
-        //     })
-        //     // .attr("class","text" + d.id)
-        //     .attr("x", d => (xScale(d.x)))
-        //     .attr("y", d=> (yScale(d.y)));
     }
     else {
-        if (record == true) {
+        if (Isrecord == true) {
             selection.enter().append('circle')
                 .attr('cx', function (d) {
                     return (xScale(d.x));
@@ -202,8 +177,6 @@ function Update_Tsne_node(data) {
                 .attr("y", d=> (yScale(d.y)))
         }
 
-
-
     }
 
 }
@@ -212,11 +185,13 @@ function Update_Tsne_node(data) {
 // Update the data with the given t-SNE result
 function UpdateDataTSNE(data) {
     data.forEach(function(d, i) {
-        store_process_tsne_data[i].x = d[0];  // Add the t-SNE x result to the dataset
-        store_process_tsne_data[i].y = d[1];  // Add the t-SNE y result to the dataset
-        store_process_tsne_data[i].image_canvas=store_image_in_canvas[i];
-        store_process_tsne_data[i].url = fileContent[i];
-        store_process_tsne_data[i].id = i;
-        store_process_tsne_data[i].lable = audio_label[i];
+            store_process_tsne_data[i].x = d[0];  // Add the t-SNE x result to the dataset
+            store_process_tsne_data[i].y = d[1];  // Add the t-SNE y result to the dataset
+            store_process_tsne_data[i].image_canvas = store_image_in_canvas[i];
+            store_process_tsne_data[i].url = fileContent[i];
+            store_process_tsne_data[i].id = i;
+            store_process_tsne_data[i].lable = audio_label[i];
+
+
     });
 }

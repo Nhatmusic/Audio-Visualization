@@ -259,12 +259,15 @@
             // console.log(this.Y);
             this.dists = xtod(X); // convert X to distances using gaussian kernel
             this.P = d2p(this.dists , this.perplexity, 1e-4, this.maxtries); // attach to object
-            this.N = X.length;
+
             // this.initSolution();
             // this.Y = randn2d(this.N, this.dim);
             this.Y.push([0.00001,0.00001]);
-            this.gains.push([0.00001,0.00001]); // step gains to accelerate progress in unchanging directions
-            this.ystep.push([0.00001,0.00001]); //momentum accumulator
+            this.N = X.length;
+            this.gains = randn2d(this.N, this.dim, 1.0); // step gains to accelerate progress in unchanging directions
+            this.ystep = randn2d(this.N, this.dim, 0.0); // momentum accumulator
+            // this.gains.push([0.00001,0.00001]); // step gains to accelerate progress in unchanging directions
+            // this.ystep.push([0.00001,0.00001]); //momentum accumulator
             // this.iter = 0; // reset iter
             // console.log(this);
             // this.initSolution(); // refresh this
@@ -323,7 +326,7 @@
             }
             // console.log(this.ystep);
             //if(this.iter%100===0) console.log('iter ' + this.iter + ', cost: ' + cost);
-
+            // console.log(cost);
             return cost; // return current cost
         },
 

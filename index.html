@@ -60,73 +60,70 @@
 
         </div>
         <div class="row">
-            <div class="col-sm-4 well">
-                <div class="form">Audio's Length
-                    <input type=number value=4 id="duration"><br>
+            <div class="col-2">
+            <div class="card bg-light mb-3" style="max-width: 20rem;">
+                <h7 class="card-header" style="font-family:Arial;text-align:center">Control Panel</h7>
+
+                <h12 style="font-family:Arial;">Audio's Duration</h12>
+                <div class="form">
+                    <input type=range min="4" max="100" value=4 id="myRange0" oninput="duration.value = myRange0.value">
+                    <output name="Output0" id="duration">4</output>
                 </div>
+
+                <h12 style="font-family:Arial;">Perplexity</h12>
                 <div class="slidecontainer_perplexity">
-
-                    <input type="range" min="1" max="100" value="20" class="slider" id="myRange1" oninput="perplexity_output.value = myRange1.value"> Perplexity
+                    <input type="range" min="5" max="100" value="20" class="slider" id="myRange1" oninput="perplexity_output.value = myRange1.value">
                     <output name="Output1" id="perplexity_output">20</output>
-
                 </div>
+                <h12 style="font-family:Arial;">Iteration</h12>
                 <div class="slidecontainer_iteration">
-                    <input type="range" min="100" max="5000" value="100" class="slider" id="myRange2" oninput="iteration_output.value = myRange2.value"> Iterations
+
+                    <input type="range" min="100" max="5000" value="100" class="slider" id="myRange2" oninput="iteration_output.value = myRange2.value">
                     <output name="Output2" id="iteration_output">100</output>
                 </div>
-            </div>
-
-<!--            <div class="col-sm-4 well">-->
-<!--                <div class="slidecontainer_perplexity">-->
-
-<!--                    <input type="range" min="1" max="100" value="20" class="slider" id="myRange1" oninput="perplexity_output.value = myRange1.value"> Perplexity-->
-<!--                    <output name="Output1" id="perplexity_output">20</output>-->
-
-<!--                </div>-->
-<!--            </div>-->
-<!--            <div class="col-sm-4 well">-->
-<!--                <div class="slidecontainer_iteration">-->
-<!--                    <input type="range" min="100" max="5000" value="100" class="slider" id="myRange2" oninput="iteration_output.value = myRange2.value"> Iterations-->
-<!--                    <output name="Output2" id="iteration_output">100</output>-->
-<!--                </div>-->
-<!--            </div>-->
-
-        </div>
-        <div class="row">
-            <div class="col-md-12 well" id="live_canvas">
-                <div class="span">13 MFCC Heatmap</div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-8" id="theGraph">
-
-                <div class="span">T-SNE Output Scatterplot</div>
 
             </div>
-            <div class="col-md-4" id="tooltip_all">
-
-                <div class="row">
-                    <div class="span">Sample's Euclidean Distance Comparision</div>
-                    <div id="tooltip_line" width="500" height="300">
-
+            </div>
+            <div class="col-5">
+            <div class="card bg-light mb-3" style="max-width: 140rem;">
+                <div class="card-header" style="font-family:Arial;text-align:center">MFCC Heatmap</div>
+                <div id="live_canvas">
+                </div>
+            </div>
+            </div>
+            <div class="col-5">
+                <div class="card bg-light mb-3" style="max-width: 140rem;">
+                    <div class="card-header" style="font-family:Arial;text-align:center">Sound Spectrogram</div>
+                    <div id="sound_spectro">
                     </div>
                 </div>
-                <div class="row">
-
-                    <canvas id="tooltip_radar" width="200" height="200">
-                    </canvas>
-                    <canvas id="tooltip_radar_compare" width="200" height="200">
-                    </canvas>
-                </div>
             </div>
         </div>
-        <div class="row" style="position: relative; height:300px; width:300px">
-            <canvas id="marksChart" height="200px" width="200px"></canvas>
-            <canvas id="myCanvas" ></canvas>
-            <!--        <canvas id="myCanvas" height="300px" width="300px"></canvas>-->
+
+        <div class="row">
+            <div class="col-2" id="tooltip_all">
+                <div class="card bg-light mb-3" style="max-width: 20rem;">
+                    <h7 class="card-header" style="font-family:Arial;text-align:center">Euclidean Distance Comparision</h7>
+                    <div id="tooltip_line" width="500" height="300"></div>
+                    <canvas id="tooltip_radar" width="200" height="200"></canvas>
+                    <canvas id="tooltip_radar_compare" width="200" height="200"></canvas>
+                </div>
+                <div class="row" style="position: relative; height:300px; width:300px">
+                    <canvas id="marksChart" height="200px" width="200px"></canvas>
+                    <canvas id="myCanvas" ></canvas>
+                </div>
+            </div>
+
+            <div class="col-10" >
+                <div class="card bg-light mb-3" style="max-width: 280rem;">
+                    <div class="card-header" style="font-family:Arial;text-align:center">TSNE Scatterplot</div>
+                    <div id="theGraph">
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
-</div>
 </div>
 </body>
 </html>

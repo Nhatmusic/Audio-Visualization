@@ -152,7 +152,7 @@ h4 {
     border-radius: 50%;
     border-top: 16px solid gray;
     border-right: 16px solid black;
-    border-bottom: 16px solid white;
+    border-bottom: 16px solid lightgray;
     width: 20px;
     height: 20px;
     position: absolute;
@@ -279,21 +279,33 @@ h4 {
 #button5:hover {background-color: deepskyblue;
 }
 
-.slidecontainer_perplexity{
-  height:25px;
-}
-.slidecontainer_iteration{
-    height:25px;
+/*.slidecontainer_perplexity{*/
+/*    position: relative;*/
+/*    height:25px;*/
+/*}*/
+/*.slidecontainer_iteration{*/
+/*    position: relative;*/
+/*    height:25px;*/
+/*}*/
+/*#live_canvas{*/
+/*    position: relative;*/
+/*    top:-150px;*/
+/*    left:350px;*/
+/*}*/
+#duration{
+    position: relative;
+    top: -20px;
+    left: 25px
 }
 #iteration_output{
     position: relative;
-    top: -60px;
-    left: 20px
+    top: -20px;
+    left: 25px
 }
 #perplexity_output{
     position: relative;
-    top: -60px;
-    left: 20px
+    top: -20px;
+    left: 25px
 }
 #tsne{
     position: absolute;
@@ -301,10 +313,10 @@ h4 {
     top:-10px;
 }
 
-#tooltip_all {
-    /*width:520px !important;*/
-    height: 635px !important;
-}
+/*#tooltip_all {*/
+/*    !*width:520px !important;*!*/
+/*    height: 635px !important;*/
+/*}*/
 
 #tooltip_radar{
     position: absolute;

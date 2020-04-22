@@ -26,9 +26,9 @@ let tsne_config = {
 };
 
 //set up heatmap canvas
-var BOX_WIDTH = 5;
-var BOX_HEIGHT = 5;
-var heatmap_max_length = 84;
+var BOX_WIDTH = 7;
+var BOX_HEIGHT = 7;
+var heatmap_max_length = 27;
 
 //get file directory
 window.onload = function () {
@@ -73,7 +73,7 @@ let width = 1600, height = 600,
 function setup() {
 // canvas setup
 //     frameRate(30);
-    var live_canvas=createCanvas(heatmap_max_length*BOX_WIDTH*4.0, 26*BOX_HEIGHT);
+    var live_canvas=createCanvas(heatmap_max_length*BOX_WIDTH*4.0, 28*BOX_HEIGHT);
     live_canvas.parent('live_canvas');
     background(0)
     //Create worker to draw self-similarity-matrix in canvas whenever it has data

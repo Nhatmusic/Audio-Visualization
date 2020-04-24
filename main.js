@@ -26,8 +26,8 @@ let tsne_config = {
 };
 
 //set up heatmap canvas
-var BOX_WIDTH = 7;
-var BOX_HEIGHT = 7;
+// var BOX_WIDTH = windowWidth/2.5/30;
+// var BOX_HEIGHT = windowHeight/3.5/13;
 var heatmap_max_length = 27;
 
 //get file directory
@@ -73,9 +73,13 @@ let width = window.innerWidth/3, height = window.innerHeight/3,
 function setup() {
 // canvas setup
 //     frameRate(30);
-    var live_canvas=createCanvas(windowWidth/2.5, windowHeight/3);
+    //set up heatmap canvas
+     BOX_WIDTH = 8;
+     BOX_HEIGHT = 8;
+    var live_canvas=createCanvas(windowWidth/2.5, windowHeight/3.5);
     live_canvas.parent('live_canvas');
     background(0)
+
     //Create worker to draw self-similarity-matrix in canvas whenever it has data
     draw_ssm_worker = new Worker('drawssm.js');
     tsne_data_worker = new Worker('process_tsne_data.js');
@@ -514,6 +518,6 @@ function startrecord() {
 
 }
 function windowResized() {
-    resizeCanvas(windowWidth/2.5, windowHeight/3);
+    resizeCanvas(windowWidth/2.5, windowHeight/3.5);
     // canvas.position(windowWidth/4, windowHeight/4);
 }

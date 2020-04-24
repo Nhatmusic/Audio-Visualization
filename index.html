@@ -91,33 +91,39 @@
                 </div>
             </div>
             </div>
-            <div class="col-5">
+            <div class="col-5" id="tooltip_all">
                 <div class="card bg-light mb-3" style="max-width: 140rem;">
-                    <div class="card-header" style="font-family:Arial;text-align:center">Sound Spectrogram</div>
-                    <div id="sound_spectro">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-2" id="tooltip_all">
-                <div class="card bg-light mb-3" style="max-width: 20rem;">
                     <h7 class="card-header" style="font-family:Arial;text-align:center">Euclidean Distance Comparision</h7>
                     <div id="tooltip_line" width="500" height="300"></div>
                     <canvas id="tooltip_radar" width="200" height="200"></canvas>
                     <canvas id="tooltip_radar_compare" width="200" height="200"></canvas>
                 </div>
-                <div class="row" style="position: relative; height:300px; width:300px">
-                    <canvas id="marksChart" height="200px" width="200px"></canvas>
-                    <canvas id="myCanvas" ></canvas>
                 </div>
             </div>
+        </div>
 
-            <div class="col-10" >
+        <div class="row">
+<!--            <div class="col-2" id="tooltip_all">-->
+<!--                <div class="card bg-light mb-3" style="max-width: 140rem;">-->
+<!--                    <h7 class="card-header" style="font-family:Arial;text-align:center">Euclidean Distance Comparision</h7>-->
+<!--                    <div id="tooltip_line" width="500" height="300"></div>-->
+<!--                    <canvas id="tooltip_radar" width="200" height="200"></canvas>-->
+<!--                    <canvas id="tooltip_radar_compare" width="200" height="200"></canvas>-->
+<!--                </div>-->
+<!--                <div class="row" style="position: relative; height:300px; width:300px">-->
+<!--                    <canvas id="marksChart" height="200px" width="200px"></canvas>-->
+<!--                    <canvas id="myCanvas" ></canvas>-->
+<!--                </div>-->
+<!--            </div>-->
+
+            <div class="col-9" >
                 <div class="card bg-light mb-3" style="max-width: 280rem;">
                     <div class="card-header" style="font-family:Arial;text-align:center">TSNE Scatterplot</div>
-                    <div id="theGraph">
+                    <div id="theGraph" class="svg-container">
+                    </div>
+                    <div class="row" style="position: relative; height:300px; width:300px">
+                        <canvas id="marksChart" height="200px" width="200px"></canvas>
+                        <canvas id="myCanvas" ></canvas>
                     </div>
                 </div>
             </div>

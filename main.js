@@ -65,7 +65,7 @@ Audio.prototype.stop = function () {
     // Reset the playback time marker
     this.currentTime = 0;
 };
-let width = 1600, height = 600,
+let width = window.innerWidth/3, height = window.innerHeight/3,
     margin = {left: 50, top: 50, right: 50, bottom: 50},
     contentWidth = width - margin.left - margin.right,
     contentHeight = height - margin.top - margin.bottom;
@@ -73,7 +73,7 @@ let width = 1600, height = 600,
 function setup() {
 // canvas setup
 //     frameRate(30);
-    var live_canvas=createCanvas(heatmap_max_length*BOX_WIDTH*4.0, 28*BOX_HEIGHT);
+    var live_canvas=createCanvas(windowWidth/2.5, windowHeight/3);
     live_canvas.parent('live_canvas');
     background(0)
     //Create worker to draw self-similarity-matrix in canvas whenever it has data
@@ -83,9 +83,14 @@ function setup() {
 
     //initiate scatter plot for tsne
     svg_scatterplot = d3.select("#theGraph")
+        .append("div")
+        .classed("svg-container", true)
         .append("svg")
-        .attr("width", width)
-        .attr("height", height);
+        // .attr("width", width)
+        // .attr("height", height)
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", "0 0 900 400")
+        .classed("svg-content", true);
 
     scatterplot = svg_scatterplot
         .append("g")
@@ -145,7 +150,7 @@ function get_mfcc_data(a, index) {
                     'bufferSize': windowsize,
                     'hopSize': windowsize / (parseInt($('#duration').val(), 10) / duration1),
                     'numberOfMFCCCoefficients': 20,
-                    'featureExtractors': [featureType, featureType2],
+                    'featureExtractors': [featureType, featureType2, 'amplitudeSpectrum'],
                     'callback': mfcc_extract
                 });
                 //start Meyda Analyzer
@@ -324,6 +329,7 @@ function all_worker_process(){
 function mfcc_extract(features) {
     var mfcc = features[featureType];
     var rms = features[featureType2];
+    var spectrum = features['amplitudeSpectrum'];
     //mfcc data contains all the mfcc feature extracted from sound in time series
     if (rms > 0) {
         mfcc_data.push(mfcc)
@@ -332,6 +338,7 @@ function mfcc_extract(features) {
     if(Isrecord == true & mfcc_data.length % 40 == 0 & mfcc_data.length>0){
             all_worker_process()
     }
+    console.log(spectrum);
 }
 
 //the function take self_similarity data as an input and then draw the self_similarity matrix
@@ -505,4 +512,8 @@ function startrecord() {
         alert(err)
     })
 
+}
+function windowResized() {
+    resizeCanvas(windowWidth/2.5, windowHeight/3);
+    // canvas.position(windowWidth/4, windowHeight/4);
 }

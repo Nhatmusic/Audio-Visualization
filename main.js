@@ -65,7 +65,7 @@ Audio.prototype.stop = function () {
     // Reset the playback time marker
     this.currentTime = 0;
 };
-let width = window.innerWidth/3, height = window.innerHeight/3,
+let width = window.innerWidth/3, height = window.innerHeight/3.5,
     margin = {left: 50, top: 50, right: 50, bottom: 50},
     contentWidth = width - margin.left - margin.right,
     contentHeight = height - margin.top - margin.bottom;
@@ -74,9 +74,9 @@ function setup() {
 // canvas setup
 //     frameRate(30);
     //set up heatmap canvas
-     BOX_WIDTH = 8;
-     BOX_HEIGHT = 8;
-    var live_canvas=createCanvas(windowWidth/2.5, windowHeight/3.5);
+     BOX_WIDTH = 10;
+     BOX_HEIGHT = 9;
+    var live_canvas=createCanvas(windowWidth/2.2, windowHeight/3.5);
     live_canvas.parent('live_canvas');
     background(0)
 
@@ -98,7 +98,7 @@ function setup() {
 
     scatterplot = svg_scatterplot
         .append("g")
-        .attr("transform", `translate(${50}, ${50})`)
+        .attr("transform", `translate(${150}, ${50})`)
         .attr("id", "snodes");
 }
 
@@ -520,4 +520,154 @@ function startrecord() {
 function windowResized() {
     resizeCanvas(windowWidth/2.5, windowHeight/3.5);
     // canvas.position(windowWidth/4, windowHeight/4);
+}
+
+function euclideanDistance(a, b) {
+    var sum = 0;
+    if (a.length == b.length) {
+
+        sum = distance(a, b);
+        //if 2 vector does not have the same data lenthg, fill 0 to the rest of smaller dimension vector
+    } else if (a.length < b.length) {
+        a = a.concat(Array(b.length - a.length).fill(0))
+        sum = distance(a, b);
+
+    } else {
+        b = b.concat(Array(a.length - b.length).fill(0))
+
+        sum = distance(a, b)
+
+    }
+    return sum
+}
+
+function playmusic(){
+    let graph1 = {};
+    graph1.nodes = [];
+    graph1.links = [];
+    for ( i=0; i < store_process_tsne_data.length; i++) {
+        graph1.nodes.push({"id": i, "links": []})
+    }
+    var link2=[];
+    for (i = 0; i < store_process_tsne_data.length - 1; i++) {
+        var link1 = [];
+        for (j = i + 1; j < store_process_tsne_data.length; j++) {
+            link1.push({"source": i, "target": j, "weight": euclideanDistance(store_process_tsne_data[i],store_process_tsne_data[j]),
+                "connection": store_process_tsne_data[i].label+ " : " +store_process_tsne_data[j].label})
+        }
+        link2.push(link1)
+    }
+    graph1.links=d3.merge(link2)
+
+    //create minimumSpanningTree
+    minimumSpanningTree = mst(graph1);
+    var store_nodes=[];
+    minimumSpanningTree.links.forEach(d=> {
+        store_nodes.push([store_process_tsne_data[d.source],store_process_tsne_data[d.target]])
+    })
+    draw_path(store_nodes,100)
+
+}
+function draw_shortestpath(){
+    var node_circle=[];
+    node_circle = svg_scatterplot.selectAll("circle")._groups[0];
+    minimumSpanningTree.links.forEach(d=>{
+        minimumSpanningTree.links.push({"source":d.target,"target":d.source,"weight": d.weight})
+    })
+    var nodes= minimumSpanningTree.nodes;
+    var links= minimumSpanningTree.links;
+
+    function convert_graph(graph) {
+        var j, k, l, len, len1, map, n, ref;
+        map = {};
+        ref = graph.nodes;
+        for (j = 0, len = ref.length; j < len; j++) {
+            n = ref[j];
+            for (k = 0, len1 = links.length; k < len1; k++) {
+                l = links[k];
+                if (n.id === l.source) {
+                    if (!(n.id in map)) {
+                        map[n.id] = {};
+                    }
+                    map[n.id][l.target] = l.weight;
+                }
+            }
+        }
+        return map;
+    };
+
+    map = convert_graph(minimumSpanningTree);
+
+    var lib_graph = new Graph(map);
+    var shortest_path = lib_graph.findShortestPath(start_node_id, end_node_id);
+    for (i=0;i<shortest_path.length;i++){
+        shortest_path[i]=parseInt(shortest_path[i])}
+    var store_nodes=[];
+    shortest_path.forEach((d,i)=>{
+        if (i<shortest_path.length-1) {
+            store_nodes.push([store_process_tsne_data[shortest_path[i]], store_process_tsne_data[shortest_path[i + 1]]])
+        }
+    })
+
+    draw_path(store_nodes,900)
+    var store_links=[];
+    minimumSpanningTree.links.forEach(d=> {
+        store_links.push(d.source,d.target)
+    })
+    svg_scatterplot.selectAll("circle").style("opacity",function (d){
+        return shortest_path.includes(d.id)?1:0.3;
+    })
+    for (var i = 0; i < shortest_path.length; i++) {
+        (function (i) {
+            setTimeout(function () {
+                PlayAudio(node_circle[shortest_path[i]], store_process_tsne_data[shortest_path[i]]);
+                d3.select(node_circle[shortest_path[i]])
+                    // Does work
+                    .attr("r", 10)
+                    .transition().duration(500)
+                    .attr("r",3);
+
+            }, 800 * (i + 1));
+        })(i);
+    }
+
+}
+function draw_path(store_nodes,time_play) {
+    scatterplot.selectAll("path").remove()
+    svg_scatterplot.selectAll("circle").style("opacity",1);
+    function length(path) {
+        return d3.create("svg:path").attr("d", path).node().getTotalLength();
+    }
+
+    var valueline = d3.line()
+        .curve(d3.curveCatmullRom)
+        .x(function (d) {
+            return xScale(d.x);
+        })
+        .y(function (d) {
+            return yScale(d.y);
+        });
+    const l = length(valueline(store_process_tsne_data));
+
+    for (var i = 0; i < store_nodes.length; i++) {
+        (function (i) {
+            setTimeout(function () {
+                scatterplot.append("path")
+                    .data([store_nodes[i]])
+                    .attr("fill", "none")
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 1)
+                    .attr("stroke-linejoin", "round")
+                    .attr("stroke-linecap", "round")
+                    .attr("stroke-dasharray", `0,${l}`)
+                    .attr("d", valueline)
+                    .attr("id", "line" + i)
+                    .transition()
+                    .duration(500)
+                    .ease(d3.easeLinear)
+                    .attr("stroke-dasharray", `${l},${l}`);
+            }, time_play * (i + 1));
+        })(i);
+    }
+
 }

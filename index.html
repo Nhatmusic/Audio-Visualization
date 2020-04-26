@@ -20,6 +20,10 @@
     <script src="./assets/js/d3.v4.min.js"></script>
     <script src="./assets/js/p5/p5.js"></script>
     <script src="./assets/js/p5/addons/p5.dom.js"></script>
+    <script src="./assets/js/disjoint-set.js"></script>
+    <script src="./assets/js/kruskal-mst.js"></script>
+    <script src="./assets/js/dijkstra.js"></script>
+    <script src="./assets/js/distance.js"></script>
 <!--    <script src="./assets/js/recorder.min.js"></script>-->
 
 </head>
@@ -55,14 +59,14 @@
                 <button type="button" class="btn btn-outline-secondary btn-block" onclick="draw_shortestpath()">Calculate MST</button>
             </div>
             <div class="col">
-                <button type="button"  class="btn btn-outline-secondary btn-block" onclick=" draw_graph()">Draw Graph</button>
+                <button type="button"  class="btn btn-outline-secondary btn-block" onclick=" playmusic()">Draw Graph</button>
             </div>
 
         </div>
         <div class="row">
-            <div class="col-2">
+            <div class="col-2 border bg-light">
             <div class="card bg-light mb-3" style="max-width: 20rem;">
-                <h7 class="card-header" style="font-family:Arial;text-align:center">Control Panel</h7>
+                <div class="card-header" style="font-family:Arial;text-align:center">Control Panel</div>
 
                 <h12 style="font-family:Arial;">Audio's Duration</h12>
                 <div class="form">
@@ -84,16 +88,16 @@
 
             </div>
             </div>
-            <div class="col-5">
-            <div class="card bg-light mb-3" style="max-width: 140rem;">
+            <div class="col-5 border bg-light">
+            <div class="card bg-light mb-3" style="max-width: 138rem;">
                 <div class="card-header" style="font-family:Arial;text-align:center">MFCC Heatmap</div>
                 <div id="live_canvas">
                 </div>
             </div>
             </div>
-            <div class="col-5" id="tooltip_all">
+            <div class="col-5 border bg-light" id="tooltip_all">
                 <div class="card bg-light mb-3" style="max-width: 140rem;">
-                    <h7 class="card-header" style="font-family:Arial;text-align:center">Euclidean Distance Comparision</h7>
+                    <div class="card-header" style="font-family:Arial;text-align:center">Euclidean Distance Comparision</div>
                     <div id="tooltip_line" width="500" height="300"></div>
                     <canvas id="tooltip_radar" width="200" height="200"></canvas>
                     <canvas id="tooltip_radar_compare" width="200" height="200"></canvas>
@@ -116,7 +120,13 @@
 <!--                </div>-->
 <!--            </div>-->
 
-            <div class="col-9" >
+            <div class="col-2 border bg-light">
+                <div class="card bg-light mb-3" style="max-width: 20rem; width: 100%">
+                    <div class="card-header" style="font-family:Arial;text-align:center">Radar Chart</div>
+                    <div id = radar_chart></div>
+                </div>
+            </div>
+            <div class="col-10 border bg-light" >
                 <div class="card bg-light mb-3" style="max-width: 280rem;">
                     <div class="card-header" style="font-family:Arial;text-align:center">TSNE Scatterplot</div>
                     <div id="theGraph" class="svg-container">

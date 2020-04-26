@@ -3,6 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="497b5d7f-4cea-4f0d-8663-c707659d5d93" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/assets/css/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -108,7 +110,9 @@
       <workItem from="1587227368368" duration="6719000" />
       <workItem from="1587433042979" duration="8281000" />
       <workItem from="1587513331523" duration="9354000" />
-      <workItem from="1587692824210" duration="8031000" />
+      <workItem from="1587692824210" duration="8072000" />
+      <workItem from="1587746941581" duration="1285000" />
+      <workItem from="1587870053574" duration="6217000" />
     </task>
     <servers />
   </component>
@@ -120,15 +124,12 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="1023" y="511" key="#com.intellij.fileTypes.FileTypeChooser/0.0.2560.1400@0.0.2560.1400" timestamp="1581700498820" />
-    <state x="550" y="172" key="FileChooserDialogImpl" timestamp="1583619537581">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state x="688" y="217" key="FileChooserDialogImpl" timestamp="1587878042945">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="550" y="172" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1583619537581" />
+    <state x="688" y="217" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1587878042945" />
     <state x="917" y="292" key="FileChooserDialogImpl/0.0.2560.1400@0.0.2560.1400" timestamp="1582037854492" />
-    <state x="426" y="188" key="run.anything.popup" timestamp="1578895739315">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="426" y="188" key="run.anything.popup/0.0.1536.824@0.0.1536.824" timestamp="1578895739315" />
     <state x="539" y="183" width="840" height="856" key="search.everywhere.popup" timestamp="1587527768819">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

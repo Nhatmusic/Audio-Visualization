@@ -160,8 +160,8 @@ h4 {
     width: 20px;
     height: 20px;
     position: absolute;
-    left: 200px;
-    top: 10px;
+    left: 300px;
+    top: 8px;
     -webkit-animation: spin 2s linear infinite;
     animation: spin 2s linear infinite;
 }
@@ -337,7 +337,7 @@ h4 {
     left: 100px;
     top: 265px;
 }
-
+/*Make Dynamic SVG*/
 .svg-container {
     display: inline-block;
     position: relative;
@@ -353,6 +353,11 @@ h4 {
     left: 0;
 }
 
+.card-header{
+    height: 40px;
+}
+
+/* Style Control Panel for Tsne Input*/
 input[type='range'] {
     align-self: center;
     margin: -0.75em 0;

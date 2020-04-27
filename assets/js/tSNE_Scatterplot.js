@@ -62,7 +62,7 @@ function Update_Tsne_node(data) {
         scatterplot.selectAll('text').remove();
         selection.enter().append("text")
             .text(function (d) {
-                return d.lable;
+                return d.label;
             })
             .attr("class", (d) => "text" + d.id)
             .attr("x", function (d) {return xScale(d.x) })
@@ -83,6 +83,7 @@ function Update_Tsne_node(data) {
             .attr('width', 10)
             .attr('height', 10)
             .on('mouseover', function (d) {
+                active_value = d.id;
                 noLoop();
                 for(let i = 0; i < mfcc_data_all[d.id].length; i++ ) {
                     for (let j = 0; j < mfcc_data_all[d.id][i].length; j++) {
@@ -104,15 +105,40 @@ function Update_Tsne_node(data) {
                     .attr("height", 50);
                 d3.selectAll('text').style("opacity",0);
 
+                scatterplot.selectAll("path")
+                    .style('stroke-width', function(d) {
+                    return (d[0].id == active_value || d[1].id == active_value ? 5: 1)
+                })
+                        .style('opacity', function(d) {
+                            return (d[0].id == active_value || d[1].id == active_value ? 0.5: 1)
+                        })
                 d3.select(".text"+ d.id).style("font-size", "20px").style("opacity",1);
+                draw_euclidean_line_chart(d);
+                draw_radar_chart_comparision(d);
 
             })
+             .on("click", function (d){
+                 if (selected_node==false){
+                     minimumSpanningTree.nodes[d.id].start=true;
+                     start_node_id=d.id
+                     $.notify("Start Node Selected", "success");
+                     selected_node=true;
+                 }
+                 else {
+                     minimumSpanningTree.nodes[d.id].end=true;
+                     $.notify("End Node Selected", "success");
+                     end_node_id=d.id;
+                     selected_node=false;
+                 }
+             })
             .on('mouseout', function (d) {
                 d3.select(this)
                     .attr("width", 10)
                     .attr("height", 10)
                 d3.select(".text"+ d.id).style("opacity",1).style("font-size", "10px");
                 d3.selectAll('text').style("opacity",1);
+                scatterplot.selectAll("path")
+                    .style('stroke-width',1);
             });
 
         //Update
@@ -152,7 +178,7 @@ function Update_Tsne_node(data) {
         else {
             selection.enter().append("text")
                 .text(function (d) {
-                    return d.lable;
+                    return d.label;
                 })
                 .attr("class", "texte")
                 .attr("x", function (d) {return xScale(d.x) })
@@ -190,8 +216,6 @@ function UpdateDataTSNE(data) {
             store_process_tsne_data[i].image_canvas = store_image_in_canvas[i];
             store_process_tsne_data[i].url = fileContent[i];
             store_process_tsne_data[i].id = i;
-            store_process_tsne_data[i].lable = audio_label[i];
-
-
+            store_process_tsne_data[i].label = audio_label[i];
     });
 }

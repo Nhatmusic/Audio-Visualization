@@ -9,6 +9,11 @@ let tsne_worker;
 let tsne_data_worker;
 let store_process_tsne_data = [];
 let empty = [];
+//minimum spanning trê
+let selected_node=false;
+let start_node_id;
+let end_node_id;
+
 let fakeDataforfirstplot = [];
 let store_image_in_canvas = [];
 let output_tsne;
@@ -38,8 +43,8 @@ window.onload = function () {
         let files = event.target.files;
         // console.log(files);
         for (i = 0; i < files.length; i++) {
-            // audio_label.push(files[i].name.split('_').slice(0, 2).join("_"));
-            audio_label.push(files[i].name);
+            audio_label.push(files[i].name.split('_').slice(0, 2).join("_"));
+            // audio_label.push(files[i].name);
             fileContent.push(URL.createObjectURL(files[i]));
             fakeDataforfirstplot.push([0]);
         }
@@ -74,7 +79,7 @@ function setup() {
 // canvas setup
 //     frameRate(30);
     //set up heatmap canvas
-     BOX_WIDTH = 10;
+     BOX_WIDTH = 9;
      BOX_HEIGHT = 9;
     var live_canvas=createCanvas(windowWidth/2.2, windowHeight/3.5);
     live_canvas.parent('live_canvas');
@@ -150,10 +155,10 @@ function get_mfcc_data(a, index) {
                     'audioContext': offlineCtx,
                     'source': source11,
                     'melBands': 26,
-                    'sampleRate': 44100,
+                    'sampleRate': 22050,
                     'bufferSize': windowsize,
                     'hopSize': windowsize / (parseInt($('#duration').val(), 10) / duration1),
-                    'numberOfMFCCCoefficients': 20,
+                    'numberOfMFCCCoefficients': 13,
                     'featureExtractors': [featureType, featureType2, 'amplitudeSpectrum'],
                     'callback': mfcc_extract
                 });
@@ -299,7 +304,7 @@ function all_worker_process(){
                 else {
                     scatterplot.selectAll(".texte").data(store_process_tsne_data.slice(0,msg.value.length))
                         .text(function (d) {
-                            return d.lable;
+                            return d.label;
                         })
                         .attr("x", d => (xScale(d.x)))
                         .attr("y", d => (yScale(d.y)));
@@ -310,15 +315,34 @@ function all_worker_process(){
                     stopStream();
                     tsne_worker.terminate();
                 }
+
                 firstdraw = false;
 
+                //Get the url of recorded file
                 audioChunks.map( d => {
                     d = new Blob([d],{type:'audio/mpeg-3'});
                     fileContent.push(URL.createObjectURL(d));
                 })
 
                 drawscatterplot(msg.value);
+                //Get Euclidean Distance Comparision
+                store_process_tsne_data.forEach( d => {
+                    var store_distance = [];
+                    var store_label = [];
+                    var id_array = [];
+                    store_process_tsne_data.forEach(dataarray =>{
+                        if(d.id!=dataarray.id){
+                            store_distance.push(euclideanDistance(dataarray,d))
+                            store_label.push(dataarray.label);
+                            id_array.push(dataarray.id);
+                        }
+                    })
+                    d.distance_array = store_distance;
+                    d.label_array = store_label;
+                    d.id_array = id_array;
+                    }
 
+                )
 
             default:
                 break;
@@ -428,7 +452,7 @@ function fakeDataforFirstScatterplot() {
     fakeDataforfirstplot.forEach(function(d, i) {
         fakeDataforfirstplot[i].x = 0;  // Add the t-SNE x result to the dataset
         fakeDataforfirstplot[i].y = 0;  // Add the t-SNE y result to the dataset
-        fakeDataforfirstplot[i].lable = audio_label[i];
+        fakeDataforfirstplot[i].label = audio_label[i];
 
     });
 
@@ -521,7 +545,7 @@ function windowResized() {
     resizeCanvas(windowWidth/2.5, windowHeight/3.5);
     // canvas.position(windowWidth/4, windowHeight/4);
 }
-
+//Minimum Spanning Tree
 function euclideanDistance(a, b) {
     var sum = 0;
     if (a.length == b.length) {
@@ -540,8 +564,7 @@ function euclideanDistance(a, b) {
     }
     return sum
 }
-
-function playmusic(){
+function draw_tree(){
     let graph1 = {};
     graph1.nodes = [];
     graph1.links = [];
@@ -570,7 +593,7 @@ function playmusic(){
 }
 function draw_shortestpath(){
     var node_circle=[];
-    node_circle = svg_scatterplot.selectAll("circle")._groups[0];
+    node_circle = svg_scatterplot.selectAll("image")._groups[0];
     minimumSpanningTree.links.forEach(d=>{
         minimumSpanningTree.links.push({"source":d.target,"target":d.source,"weight": d.weight})
     })
@@ -596,7 +619,7 @@ function draw_shortestpath(){
         return map;
     };
 
-    map = convert_graph(minimumSpanningTree);
+    var map = convert_graph(minimumSpanningTree);
 
     var lib_graph = new Graph(map);
     var shortest_path = lib_graph.findShortestPath(start_node_id, end_node_id);
@@ -614,7 +637,10 @@ function draw_shortestpath(){
     minimumSpanningTree.links.forEach(d=> {
         store_links.push(d.source,d.target)
     })
-    svg_scatterplot.selectAll("circle").style("opacity",function (d){
+    svg_scatterplot.selectAll("image").style("opacity",function (d){
+        return shortest_path.includes(d.id)?1:0.3;
+    })
+    svg_scatterplot.selectAll("text").style("opacity",function (d){
         return shortest_path.includes(d.id)?1:0.3;
     })
     for (var i = 0; i < shortest_path.length; i++) {
@@ -623,9 +649,11 @@ function draw_shortestpath(){
                 PlayAudio(node_circle[shortest_path[i]], store_process_tsne_data[shortest_path[i]]);
                 d3.select(node_circle[shortest_path[i]])
                     // Does work
-                    .attr("r", 10)
+                    .attr('width', 20)
+                    .attr('height', 20)
                     .transition().duration(500)
-                    .attr("r",3);
+                    .attr('width', 10)
+                    .attr('height', 10);
 
             }, 800 * (i + 1));
         })(i);
@@ -634,7 +662,7 @@ function draw_shortestpath(){
 }
 function draw_path(store_nodes,time_play) {
     scatterplot.selectAll("path").remove()
-    svg_scatterplot.selectAll("circle").style("opacity",1);
+    svg_scatterplot.selectAll("image").style("opacity",1);
     function length(path) {
         return d3.create("svg:path").attr("d", path).node().getTotalLength();
     }
@@ -669,5 +697,86 @@ function draw_path(store_nodes,time_play) {
             }, time_play * (i + 1));
         })(i);
     }
+
+}
+
+//Euclidean Distance Comparision
+function draw_euclidean_line_chart(dataset){
+    var trace1 = {
+        x: dataset.id_array,
+        y: dataset.distance_array,
+        mode: 'lines+markers',
+        type: 'scatter',
+        name: 'North America',
+        text: dataset.label_array,
+        marker: {
+            color: 'rgb(219, 64, 82)',
+            size: 12,
+            line: {
+                color: 'black',
+                width: 0.5
+            }
+        },
+
+    };
+
+    var layout = {
+        width: windowWidth/2.2,
+        height: windowHeight/3.5
+    };
+
+    var data = trace1;
+
+    Plotly.newPlot('Euclidean_distance', [data], layout);
+}
+
+function draw_radar_chart_comparision(dataset){
+    var nearest_neigbor = math.min(dataset.distance_array);
+    var get_id_label = dataset.distance_array.indexOf(nearest_neigbor);
+    // var N = 39;
+    // var array_label = [];
+    // array_label = Array.apply(null,{length:N}).map(Number.call, Number);
+    // var array_label_string = array_label.map(String);
+    data = [
+        {
+            type: 'scatterpolar',
+            r: dataset,
+            // theta: array_label_string,
+            fill: 'toself',
+            name: dataset.label
+        },
+        {
+            type: 'scatterpolar',
+            r: store_process_tsne_data[dataset.id_array[get_id_label]],
+            // theta: array_label_string,
+            fill: 'toself',
+            name: dataset.label_array[get_id_label]
+        }
+    ]
+
+    layout = {
+        polar: {
+            radialaxis: {
+                visible: true,
+                range: [math.min(dataset),math.max(dataset)],
+
+            },
+            angularaxis: {
+                showticklabels: false,
+                ticks: ''
+            }
+
+        },
+        showlegend: true,
+        legend: {
+            x: 1,
+            xanchor: 'right',
+            y: 1
+        },
+        width: 330,
+        autosize: true
+    }
+
+    Plotly.newPlot("radar_chart", data, layout)
 
 }

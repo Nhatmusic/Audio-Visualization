@@ -13,8 +13,9 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <!--    <link rel="stylesheet" href="./assets/css/bootstrap.min.css">-->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-<!--    <script src="./assets/js/jquery.min.js"></script>-->
-<!--    <script src="./assets/js/bootstrap.min.js"></script>-->
+    <script src="./assets/js/jquery.min.js"></script>
+    <script src="./assets/js/bootstrap.min.js"></script>
+    <script src="./assets/js/notify.js"></script>
     <script src="./assets/js/meyda.min.js"></script>
     <script src="./assets/js/math.min.js"></script>
     <script src="./assets/js/d3.v4.min.js"></script>
@@ -24,6 +25,8 @@
     <script src="./assets/js/kruskal-mst.js"></script>
     <script src="./assets/js/dijkstra.js"></script>
     <script src="./assets/js/distance.js"></script>
+    <script src="./assets/js/notify.js"></script>
+    <script src="./assets/js/plotly-latest.min.js"></script>
 <!--    <script src="./assets/js/recorder.min.js"></script>-->
 
 </head>
@@ -56,10 +59,10 @@
                 <button type="button" class="btn btn-outline-secondary btn-block" onclick=stopStream()><i class="fa fa-stop-circle-o fa-lg" aria-hidden="true"></i></button>
             </div>
             <div class="col">
-                <button type="button" class="btn btn-outline-secondary btn-block" onclick="draw_shortestpath()">Calculate MST</button>
+                <button type="button" class="btn btn-outline-secondary btn-block" onclick="draw_shortestpath()">Play Shortest Path</button>
             </div>
             <div class="col">
-                <button type="button"  class="btn btn-outline-secondary btn-block" onclick=" playmusic()">Draw Graph</button>
+                <button type="button"  class="btn btn-outline-secondary btn-block" onclick=" draw_tree()">Draw Tree</button>
             </div>
 
         </div>
@@ -98,9 +101,10 @@
             <div class="col-5 border bg-light" id="tooltip_all">
                 <div class="card bg-light mb-3" style="max-width: 140rem;">
                     <div class="card-header" style="font-family:Arial;text-align:center">Euclidean Distance Comparision</div>
-                    <div id="tooltip_line" width="500" height="300"></div>
-                    <canvas id="tooltip_radar" width="200" height="200"></canvas>
-                    <canvas id="tooltip_radar_compare" width="200" height="200"></canvas>
+                    <div id="Euclidean_distance"></div>
+<!--                    <div id="tooltip_line" width="500" height="300"></div>-->
+<!--                    <canvas id="tooltip_radar" width="200" height="200"></canvas>-->
+<!--                    <canvas id="tooltip_radar_compare" width="200" height="200"></canvas>-->
                 </div>
                 </div>
             </div>
@@ -123,7 +127,7 @@
             <div class="col-2 border bg-light">
                 <div class="card bg-light mb-3" style="max-width: 20rem; width: 100%">
                     <div class="card-header" style="font-family:Arial;text-align:center">Radar Chart</div>
-                    <div id = radar_chart></div>
+                    <div id ="radar_chart"></div>
                 </div>
             </div>
             <div class="col-10 border bg-light" >

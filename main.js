@@ -10,7 +10,7 @@ let tsne_data_worker;
 let store_process_tsne_data = [];
 let empty = [];
 //minimum spanning trê
-let selected_node=false;
+let selected_node = false;
 let start_node_id;
 let end_node_id;
 
@@ -23,7 +23,7 @@ let audioChunks = [];
 let tsne_config = {
     opt: {
         epsilon: 10, // epsilon is learning rate (10 = default)
-        perplexity: parseInt($('#myRange1').val(), 10)||5, // roughly how many neighbors each point influences (30 = default)
+        perplexity: parseInt($('#myRange1').val(), 10) || 5, // roughly how many neighbors each point influences (30 = default)
         // tsne_iteration: parseInt($('#myRange2').val(), 10) || 100,
         dim: 2 // dimensionality of the embedding (2 = default)
 
@@ -70,14 +70,15 @@ Audio.prototype.stop = function () {
     // Reset the playback time marker
     this.currentTime = 0;
 };
-let width = window.innerWidth/3, height = window.innerHeight/3.5,
+let width = window.innerWidth / 3, height = window.innerHeight / 3.5,
     margin = {left: 50, top: 50, right: 50, bottom: 50},
     contentWidth = width - margin.left - margin.right,
     contentHeight = height - margin.top - margin.bottom;
 
 function setup() {
 
-    var live_canvas=createCanvas(windowWidth/2.5, windowHeight/3.5);
+
+    var live_canvas = createCanvas(windowWidth / 2.5, windowHeight / 3.5);
     live_canvas.parent('live_canvas');
     background(0)
 
@@ -88,12 +89,12 @@ function setup() {
 
     //draw color legend for heatmap
     // select the svg area
-    var legend = d3.select("#live_canvas").append('svg').attr("width",windowWidth/2.5).attr("height",windowHeight/24);
+    var legend = d3.select("#live_canvas").append('svg').attr("width", windowWidth / 2.5).attr("height", windowHeight / 24);
 // Handmade legend
-    legend.append("rect").attr("x",160).attr("y",4).attr("width", 10).attr("height", 10).style("fill", "#008000")
-    legend.append("rect").attr("x",240).attr("y",4).attr("width", 10).attr("height", 10).style("fill", "#0000FF")
-    legend.append("text").attr("x",180).attr("y", 10).text(">0").style("font-size", "15px").attr("alignment-baseline","middle");
-    legend.append("text").attr("x",260).attr("y", 10).text("<0").style("font-size", "15px").attr("alignment-baseline","middle");
+    legend.append("rect").attr("x", 160).attr("y", 4).attr("width", 10).attr("height", 10).style("fill", "#008000")
+    legend.append("rect").attr("x", 240).attr("y", 4).attr("width", 10).attr("height", 10).style("fill", "#0000FF")
+    legend.append("text").attr("x", 180).attr("y", 10).text(">0").style("font-size", "15px").attr("alignment-baseline", "middle");
+    legend.append("text").attr("x", 260).attr("y", 10).text("<0").style("font-size", "15px").attr("alignment-baseline", "middle");
 
     //initiate scatter plot for tsne
     svg_scatterplot = d3.select("#theGraph")
@@ -111,6 +112,7 @@ function setup() {
         .attr("transform", `translate(${150}, ${50})`)
         .attr("id", "snodes");
 }
+
 
 function get_mfcc_data(a, index) {
 
@@ -143,8 +145,7 @@ function get_mfcc_data(a, index) {
                 if (index != fileContent.length) {
                     get_mfcc_data(fileContent[index], index)
                 }
-            }
-            else {
+            } else {
                 //create offline audio context to render the decoding audio data then use the offline audio context and another audio buffer source node as inputs to Meyda Analyzer
                 var offlineCtx = new OfflineAudioContext(1, 44100 * duration1, 44100);
                 //create buffer source node which is used in Meyda Analyzer
@@ -155,16 +156,16 @@ function get_mfcc_data(a, index) {
                 source11.connect(offlineCtx.destination);
                 //start the buffer source node
                 source11.start();
-                var windowsize = 4096;
+                var windowsize = parseInt($('#windowsize').val(), 10);
                 //Create Meyda analyzer and set up the parameter
                 meydaAnalyzer1 = Meyda.createMeydaAnalyzer({
                     'audioContext': offlineCtx,
                     'source': source11,
                     'melBands': 26,
-                    'sampleRate': 22050,
+                    'sampleRate': parseInt($('#samplerate').val(), 10),
                     'bufferSize': windowsize,
                     // 'hopSize': windowsize / (parseInt($('#duration').val(), 10) / duration1),
-                    // 'hopSize': windowsize/2,
+                    'hopSize': parseInt($('#hopsize').val(), 10),
                     'numberOfMFCCCoefficients': 13,
                     'featureExtractors': [featureType, featureType2, 'amplitudeSpectrum'],
                     'callback': mfcc_extract
@@ -183,13 +184,11 @@ function get_mfcc_data(a, index) {
                     all_worker_process();
                     //Create self_similarity data based on origin_data by calculate Euclidean distance between each pair of data point of origin_data
                     ++index;
-                    console.log("loading"+index)
-                   //call the function get_mfcc_data recursively
+                    console.log("loading" + index)
+                    //call the function get_mfcc_data recursively
                     if (index < fileContent.length) {
                         get_mfcc_data(fileContent[index], index)
-                    }
-
-                    else if (index == fileContent.length) {
+                    } else if (index == fileContent.length) {
 
                         d3.select("#loader").style("display", "none");
 
@@ -206,7 +205,7 @@ function get_mfcc_data(a, index) {
     return 0;
 }
 
-function all_worker_process(){
+function all_worker_process() {
     var store_each_sound_mfcc = [];
     //mfcc_data is generated from function show1 of Meyda Analyzer 1 of each sound samples
     store_each_sound_mfcc = mfcc_data;
@@ -219,7 +218,7 @@ function all_worker_process(){
     tsne_data_worker.postMessage({
         data: store_each_sound_mfcc
     })
-    draw_ssm_worker.onmessage = function(e){
+    draw_ssm_worker.onmessage = function (e) {
         var msg = e.data;
 
         switch (msg.message) {
@@ -239,7 +238,7 @@ function all_worker_process(){
     }
 
 
-    tsne_data_worker.onmessage = function(e) {
+    tsne_data_worker.onmessage = function (e) {
         var msg = e.data;
 
         switch (msg.message) {
@@ -250,25 +249,24 @@ function all_worker_process(){
                 // console.log('tsne_data_worker is ready');
                 store_process_tsne_data.push(msg.value);
                 console.log("process" + "" + store_process_tsne_data.length);
-            if (store_process_tsne_data.length == 2)
-            {
-                tsne_worker.postMessage({message: 'initTSNE', value: tsne_config.opt});
-            }
-            if (store_process_tsne_data.length > 2) {
+                if (store_process_tsne_data.length == 2) {
+                    tsne_worker.postMessage({message: 'initTSNE', value: tsne_config.opt});
+                }
+                if (store_process_tsne_data.length > 2) {
                     tsne_worker.postMessage({
                         message: 'DataReady',
                     });
-            }
-            break;
+                }
+                break;
             default:
                 break;
         }
     }
 
-    tsne_worker.onmessage = function(e) {
+    tsne_worker.onmessage = function (e) {
         var msg = e.data;
 
-        switch (msg.message){
+        switch (msg.message) {
             case 'BUSY':
                 // console.log('Iam busy');
                 break;
@@ -279,7 +277,7 @@ function all_worker_process(){
                 });
                 break;
             case 'Update':
-                if(store_process_tsne_data.length>msg.index&&store_process_tsne_data.length <= fileContent.length) {
+                if (store_process_tsne_data.length > msg.index && store_process_tsne_data.length <= fileContent.length) {
                     // console.log(msg.index);
                     tsne_worker.postMessage({
                         message: 'UpdateData',
@@ -287,7 +285,7 @@ function all_worker_process(){
                     })
                 }
 
-                if (fileContent.length ==  msg.index || (store_process_tsne_data.length ==  parseInt($('#duration').val()*5, 10) && Isrecord == true) ){
+                if (fileContent.length == msg.index || (store_process_tsne_data.length == parseInt($('#duration').val() * 5, 10) && Isrecord == true)) {
                     tsne_worker.postMessage({
                         message: 'Done'
                     })
@@ -303,13 +301,12 @@ function all_worker_process(){
                     .domain(d3.extent(msg.value.flat()))
                     .range([0, contentHeight]);
 
-                if (Isrecord == true){
+                if (Isrecord == true) {
                     scatterplot.selectAll(".compute").data(store_process_tsne_data)
                         .attr("cx", d => (xScale(d.x)))
-                        .attr("cy", d=> (yScale(d.y)));
-                }
-                else {
-                    scatterplot.selectAll(".texte").data(store_process_tsne_data.slice(0,msg.value.length))
+                        .attr("cy", d => (yScale(d.y)));
+                } else {
+                    scatterplot.selectAll(".texte").data(store_process_tsne_data.slice(0, msg.value.length))
                         .text(function (d) {
                             return d.label;
                         })
@@ -323,9 +320,9 @@ function all_worker_process(){
                     tsne_worker.terminate();
                     fileContent = [];
                     store_process_tsne_data.forEach(d => {
-                        audio_label.push(d.id);
-                    }
-                )
+                            audio_label.push(d.id);
+                        }
+                    )
 
                 }
 
@@ -340,22 +337,21 @@ function all_worker_process(){
 
                 drawscatterplot(msg.value);
                 //Get Euclidean Distance Comparision
-                store_process_tsne_data.forEach( d => {
-                    var store_distance = [];
-                    var store_label = [];
-                    var id_array = [];
-                    store_process_tsne_data.forEach(dataarray =>{
-                        if(d.id!=dataarray.id){
-                            store_distance.push(euclideanDistance(dataarray,d))
-                            store_label.push(dataarray.label);
-                            id_array.push(dataarray.id);
-                        }
-                    })
-                    d.distance_array = store_distance;
-                    d.label_array = store_label;
-                    d.id_array = id_array;
+                store_process_tsne_data.forEach(d => {
+                        var store_distance = [];
+                        var store_label = [];
+                        var id_array = [];
+                        store_process_tsne_data.forEach(dataarray => {
+                            if (d.id != dataarray.id) {
+                                store_distance.push(euclideanDistance(dataarray, d))
+                                store_label.push(dataarray.label);
+                                id_array.push(dataarray.id);
+                            }
+                        })
+                        d.distance_array = store_distance;
+                        d.label_array = store_label;
+                        d.id_array = id_array;
                     }
-
                 )
 
             default:
@@ -377,15 +373,15 @@ function mfcc_extract(features) {
         mfcc_data.push(mfcc)
 
     }
-    if(Isrecord == true & mfcc_data.length % 40 == 0 & mfcc_data.length>0){
-            all_worker_process()
+    if (Isrecord == true & mfcc_data.length % 40 == 0 & mfcc_data.length > 0) {
+        all_worker_process()
     }
 
 }
 
 //the function take self_similarity data as an input and then draw the self_similarity matrix
 function drawmatrix(self_similarity_data) {
-    var canvas="compareCanvas";
+    var canvas = "compareCanvas";
     //scale the self_similarity data value to draw
     var CSM22 = d3.scaleLinear()
         .domain([math.min(self_similarity_data), math.max(self_similarity_data)])
@@ -439,33 +435,33 @@ function drawmatrix(self_similarity_data) {
 }
 
 function draw() {
-    clear ();
-    background ( 220,220,220);
+    clear();
+    background(220, 220, 220);
     plot(mfcc_data);
 }
 
-function plot(data){
-    BOX_WIDTH = windowWidth/2.5/120;
-    BOX_HEIGHT = windowHeight/3.5/28;
-    for(let i = 0; i < data.length; i++ ) {
-        for(let j = 0; j < data [i].length; j++ ) {
+function plot(data) {
+    BOX_WIDTH = windowWidth / 2.5 / 120;
+    BOX_HEIGHT = windowHeight / 3.5 / 28;
+    for (let i = 0; i < data.length; i++) {
+        for (let j = 0; j < data [i].length; j++) {
             let color_strength = data[i][j] * 100
 
             // setting color
-            if ( data [i] [j] >= 0 )
-                fill ( 0, color_strength, 0 )
+            if (data [i] [j] >= 0)
+                fill(0, color_strength, 0)
             else
-                fill( 0, 0, - color_strength )
+                fill(0, 0, -color_strength)
             // noStroke();
             //drawing the rectangle
-            rect(i * BOX_WIDTH*2, j * BOX_HEIGHT*2, BOX_WIDTH*2, BOX_HEIGHT*2)
+            rect(i * BOX_WIDTH * 2, j * BOX_HEIGHT * 2, BOX_WIDTH * 2, BOX_HEIGHT * 2)
         }
     }
 }
 
 function fakeDataforFirstScatterplot() {
 
-    fakeDataforfirstplot.forEach(function(d, i) {
+    fakeDataforfirstplot.forEach(function (d, i) {
         fakeDataforfirstplot[i].x = 0;  // Add the t-SNE x result to the dataset
         fakeDataforfirstplot[i].y = 0;  // Add the t-SNE y result to the dataset
         fakeDataforfirstplot[i].label = audio_label[i];
@@ -477,41 +473,42 @@ function fakeDataforFirstScatterplot() {
 }
 
 //live audio recording, create microphone audio input source from audio context
-function createMicSrcFrom(audioCtx){
+function createMicSrcFrom(audioCtx) {
     /* get microphone access */
-    return new Promise((resolve, reject)=> {
+    return new Promise((resolve, reject) => {
         /* only audio */
         let constraints = {audio: true, video: false}
         Isrecord = true;
-        for (var i = 0; i < parseInt($('#duration').val() * 5); i++){
+        for (var i = 0; i < parseInt($('#duration').val() * 5); i++) {
             fileContent.push([0]);
             fakeDataforfirstplot.push([0]);
-    }
+        }
         fakeDataforFirstScatterplot();
         navigator.mediaDevices.getUserMedia(constraints)
-            .then((stream)=>{
+            .then((stream) => {
                 window.streamReference = stream;
-
-
                 /* create source from
                 microphone input stream */
                 let src = audioCtx.createMediaStreamSource(stream);
                 resolve(src);
-            record_music(stream);
-            }).catch((err)=>{reject(err)})
+                record_music(stream);
+            }).catch((err) => {
+            reject(err)
+        })
     })
 
 }
-function record_music(stream){
+
+function record_music(stream) {
     const rec = new MediaRecorder(stream);
     rec.addEventListener("dataavailable", event => {
-        audioChunks=(event.data);
+        audioChunks = (event.data);
         var blob = audioChunks[0];
         var chunk_size = blob.size;
-        var offset = chunk_size/store_process_tsne_data.length;
-        store_process_tsne_data.forEach((d,i) => {
-           var chunk = audioChunks[0].slice(offset*i,offset*(i+1));
-            chunk = new Blob([chunk],{type:'audio/webm;codecs=opus'});
+        var offset = chunk_size / store_process_tsne_data.length;
+        store_process_tsne_data.forEach((d, i) => {
+            var chunk = audioChunks[0].slice(offset * i, offset * (i + 1));
+            chunk = new Blob([chunk], {type: 'audio/webm;codecs=opus'});
             fileContent.push(URL.createObjectURL(chunk));
             d.url = fileContent[i]
         })
@@ -522,52 +519,54 @@ function record_music(stream){
 function stopStream() {
     analyzer.stop();
     if (!window.streamReference) return;
-    window.streamReference.getAudioTracks().forEach(function(track) {
+    window.streamReference.getAudioTracks().forEach(function (track) {
         track.stop();
     });
     window.streamReference = null;
 }
 
-function onMicDataCall(features, callback){
-    return new Promise((resolve, reject)=>{
+function onMicDataCall(features, callback) {
+    return new Promise((resolve, reject) => {
         var audioCtx = new AudioContext();
-        var windowsize = 1024;
+        var windowsize = parseInt($('#windowsize').val(), 10);
         createMicSrcFrom(audioCtx)
             .then((src) => {
                 // console.log(audioCtx.createBufferSource());
                 analyzer = Meyda.createMeydaAnalyzer({
                     'audioContext': audioCtx,
-                    'source':src,
-                    'bufferSize':windowsize,
+                    'source': src,
+                    'bufferSize': windowsize,
                     'melBands': 26,
-                    'sampleRate': 22050,
-                    'hopSize': windowsize/2,
-                    'featureExtractors':features,
-                    'callback':callback
+                    'sampleRate': parseInt($('#samplerate').val(), 10),
+                    'hopSize': parseInt($('#hopsize').val(), 10),
+                    'featureExtractors': features,
+                    'callback': callback
                 })
                 resolve(analyzer)
-            }).catch((err)=>{
+            }).catch((err) => {
             reject(err)
         })
     })
 }
+
 function startrecord() {
     // worker2 = new Worker('drawssm.js');
     loop();
-    mfcc_history=[];
+    mfcc_history = [];
     //create meyda analyzer and connect to mic source
     onMicDataCall([featureType, featureType2], mfcc_extract)
         .then((meydaAnalyzer) => {
             meydaAnalyzer.start()
-        }).catch((err)=>{
+        }).catch((err) => {
         alert(err)
     })
 }
 
 function windowResized() {
-    resizeCanvas(windowWidth/2.5, windowHeight/3.5);
+    resizeCanvas(windowWidth / 2.5, windowHeight / 3.5);
     // canvas.position(windowWidth/4, windowHeight/4);
 }
+
 //Minimum Spanning Tree
 function euclideanDistance(a, b) {
     var sum = 0;
@@ -587,41 +586,47 @@ function euclideanDistance(a, b) {
     }
     return sum
 }
-function draw_tree(){
+
+function draw_tree() {
     let graph1 = {};
     graph1.nodes = [];
     graph1.links = [];
-    for ( i=0; i < store_process_tsne_data.length; i++) {
+    for (i = 0; i < store_process_tsne_data.length; i++) {
         graph1.nodes.push({"id": i, "links": []})
     }
-    var link2=[];
+    var link2 = [];
     for (i = 0; i < store_process_tsne_data.length - 1; i++) {
         var link1 = [];
         for (j = i + 1; j < store_process_tsne_data.length; j++) {
-            link1.push({"source": i, "target": j, "weight": euclideanDistance(store_process_tsne_data[i],store_process_tsne_data[j]),
-                "connection": store_process_tsne_data[i].label+ " : " +store_process_tsne_data[j].label})
+            link1.push({
+                "source": i,
+                "target": j,
+                "weight": euclideanDistance(store_process_tsne_data[i], store_process_tsne_data[j]),
+                "connection": store_process_tsne_data[i].label + " : " + store_process_tsne_data[j].label
+            })
         }
         link2.push(link1)
     }
-    graph1.links=d3.merge(link2)
+    graph1.links = d3.merge(link2)
 
     //create minimumSpanningTree
     minimumSpanningTree = mst(graph1);
-    var store_nodes=[];
-    minimumSpanningTree.links.forEach(d=> {
-        store_nodes.push([store_process_tsne_data[d.source],store_process_tsne_data[d.target]])
+    var store_nodes = [];
+    minimumSpanningTree.links.forEach(d => {
+        store_nodes.push([store_process_tsne_data[d.source], store_process_tsne_data[d.target]])
     })
-    draw_path(store_nodes,100)
+    draw_path(store_nodes, 100)
 
 }
-function draw_shortestpath(){
-    var node_circle=[];
+
+function draw_shortestpath() {
+    var node_circle = [];
     node_circle = svg_scatterplot.selectAll("image")._groups[0];
-    minimumSpanningTree.links.forEach(d=>{
-        minimumSpanningTree.links.push({"source":d.target,"target":d.source,"weight": d.weight})
+    minimumSpanningTree.links.forEach(d => {
+        minimumSpanningTree.links.push({"source": d.target, "target": d.source, "weight": d.weight})
     })
-    var nodes= minimumSpanningTree.nodes;
-    var links= minimumSpanningTree.links;
+    var nodes = minimumSpanningTree.nodes;
+    var links = minimumSpanningTree.links;
 
     function convert_graph(graph) {
         var j, k, l, len, len1, map, n, ref;
@@ -646,25 +651,26 @@ function draw_shortestpath(){
 
     var lib_graph = new Graph(map);
     var shortest_path = lib_graph.findShortestPath(start_node_id, end_node_id);
-    for (i=0;i<shortest_path.length;i++){
-        shortest_path[i]=parseInt(shortest_path[i])}
-    var store_nodes=[];
-    shortest_path.forEach((d,i)=>{
-        if (i<shortest_path.length-1) {
+    for (i = 0; i < shortest_path.length; i++) {
+        shortest_path[i] = parseInt(shortest_path[i])
+    }
+    var store_nodes = [];
+    shortest_path.forEach((d, i) => {
+        if (i < shortest_path.length - 1) {
             store_nodes.push([store_process_tsne_data[shortest_path[i]], store_process_tsne_data[shortest_path[i + 1]]])
         }
     })
 
-    draw_path(store_nodes,900)
-    var store_links=[];
-    minimumSpanningTree.links.forEach(d=> {
-        store_links.push(d.source,d.target)
+    draw_path(store_nodes, 900)
+    var store_links = [];
+    minimumSpanningTree.links.forEach(d => {
+        store_links.push(d.source, d.target)
     })
-    svg_scatterplot.selectAll("image").style("opacity",function (d){
-        return shortest_path.includes(d.id)?1:0.3;
+    svg_scatterplot.selectAll("image").style("opacity", function (d) {
+        return shortest_path.includes(d.id) ? 1 : 0.3;
     })
-    svg_scatterplot.selectAll("text").style("opacity",function (d){
-        return shortest_path.includes(d.id)?1:0.3;
+    svg_scatterplot.selectAll("text").style("opacity", function (d) {
+        return shortest_path.includes(d.id) ? 1 : 0.3;
     })
     for (var i = 0; i < shortest_path.length; i++) {
         (function (i) {
@@ -683,9 +689,11 @@ function draw_shortestpath(){
     }
 
 }
-function draw_path(store_nodes,time_play) {
+
+function draw_path(store_nodes, time_play) {
     scatterplot.selectAll("path").remove()
-    svg_scatterplot.selectAll("image").style("opacity",1);
+    svg_scatterplot.selectAll("image").style("opacity", 1);
+
     function length(path) {
         return d3.create("svg:path").attr("d", path).node().getTotalLength();
     }
@@ -724,7 +732,7 @@ function draw_path(store_nodes,time_play) {
 }
 
 //Euclidean Distance Comparision
-function draw_euclidean_line_chart(dataset){
+function draw_euclidean_line_chart(dataset) {
     var trace1 = {
         x: dataset.id_array,
         y: dataset.distance_array,
@@ -744,8 +752,8 @@ function draw_euclidean_line_chart(dataset){
     };
 
     var layout = {
-        width: windowWidth/2.2,
-        height: windowHeight/3.5,
+        width: windowWidth / 2.2,
+        height: windowHeight / 3.5,
         autosize: true
     };
 
@@ -754,13 +762,9 @@ function draw_euclidean_line_chart(dataset){
     Plotly.newPlot('Euclidean_distance', [data], layout, config);
 }
 
-function draw_radar_chart_comparision(dataset){
+function draw_radar_chart_comparision(dataset) {
     var nearest_neigbor = math.min(dataset.distance_array);
     var get_id_label = dataset.distance_array.indexOf(nearest_neigbor);
-    // var N = 39;
-    // var array_label = [];
-    // array_label = Array.apply(null,{length:N}).map(Number.call, Number);
-    // var array_label_string = array_label.map(String);
     data = [
         {
             type: 'scatterpolar',
@@ -782,7 +786,7 @@ function draw_radar_chart_comparision(dataset){
         polar: {
             radialaxis: {
                 visible: true,
-                range: [math.min(dataset),math.max(dataset)],
+                range: [math.min(dataset), math.max(dataset)],
 
             },
             angularaxis: {

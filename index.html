@@ -3,20 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Sound Similarity</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
     <link rel="stylesheet" href="./assets/css/style.css">
     <link href="./assets/css/app.css" rel="stylesheet" type="text/css">
     <link href="./assets/css/install-button.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
     <!-- Compiled and minified CSS -->
-
-
-    <!-- Compiled and minified JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <!--    <link rel="stylesheet" href="./assets/css/bootstrap.min.css">-->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="./assets/js/jquery.min.js"></script>
@@ -33,7 +36,6 @@
     <script src="./assets/js/distance.js"></script>
     <script src="./assets/js/notify.js"></script>
     <script src="./assets/js/plotly-latest.min.js"></script>
-<!--    <script src="./assets/js/recorder.min.js"></script>-->
 
 </head>
 <script src="./assets/js/tSNE_Scatterplot.js"></script>
@@ -48,108 +50,187 @@
 
     <div class=".container-fluid">
         <div class="row">
-
-        <div class="col">
-            <div class="form-group">
-            <button type="button" class="btn btn-outline-secondary btn-block">
-                    <input type="file" id="filepicker" accept=".mp3,.wav,.ogg" name="fileList" multiple/>
-                <div id="loader">
+            <div class="col">
+                <div class="input-group mb-3">
+                    <button type="button" class="btn btn-outline-secondary btn-block input-group-prepend">
+                        <input type="file" id="filepicker" accept=".mp3,.wav,.ogg" name="fileList" multiple/>
+                        <div id="loader">
+                        </div>
+                    </button>
                 </div>
-            </button>
-            </div>
-        </div>
-            <div class="col">
-                <button type="button" class="btn btn-outline-secondary btn-block"  id="record" onclick=startrecord()>  <i class="fa fa-microphone fa-lg"  aria-hidden="true"></i></button>
             </div>
             <div class="col">
-                <button type="button" class="btn btn-outline-secondary btn-block" onclick=stopStream()><i class="fa fa-stop-circle-o fa-lg" aria-hidden="true"></i></button>
+                <button type="button" class="btn btn-outline-secondary btn-block" id="record" onclick=startrecord()><i
+                        class="fa fa-microphone fa-lg" aria-hidden="true"></i></button>
             </div>
             <div class="col">
-                <button type="button" class="btn btn-outline-secondary btn-block" onclick="draw_shortestpath()">Play Shortest Path</button>
+                <button type="button" class="btn btn-outline-secondary btn-block" onclick=stopStream()><i
+                        class="fa fa-stop-circle-o fa-lg" aria-hidden="true"></i></button>
             </div>
             <div class="col">
-                <button type="button"  class="btn btn-outline-secondary btn-block" onclick=" draw_tree()">Draw Tree</button>
+                <button type="button" class="btn btn-outline-secondary btn-block" onclick="draw_shortestpath()">
+                    <i class="fa fa-play-circle" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-outline-secondary btn-block" onclick=" draw_tree()">
+                    Draw MST
+                </button>
             </div>
 
         </div>
-        <div class="row">
+        <div class="row" id="body-row">
             <div class="col-2 border bg-light">
-            <div class="card bg-light mb-3" style="max-width: 20rem;">
-                <div class="card-header" style="font-family:Arial;text-align:center">Control Panel</div>
+            <!-- Sidebar -->
+            <div id="sidebar-container" class="sidebar-expanded d-none d-md-block">
+                <!-- d-* hiddens the Sidebar in smaller devices. Its itens can be kept on the Navbar 'Menu' -->
+                <!-- Bootstrap List Group -->
+                <ul class="list-group">
+                    <!-- Separator with title -->
+                    <li class="list-group-item list-group-item-dark sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
+                        <span  style="width: 85%;text-align: center">Control Panel</span>
+                    </li>
+                    <!-- /END Separator -->
+                    <!-- Menu with submenu -->
+                    <a href="#submenu1" data-toggle="collapse" aria-expanded="false"
+                       class="bg-light list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-start align-items-center">
+                            <span class="fa fa-cogs fa-fw mr-3"></span>
+                            <span class="menu-collapsed">TSNE Configuration</span>
+                            <span class="submenu-icon ml-auto"></span>
+                        </div>
+                    </a>
+                    <!-- Submenu content -->
+                    <div id='submenu1' class="collapse sidebar-submenu">
+                        <span class="menu-collapsed align-items-center">Audio's Length</span>
+                        <div class="form">
+                            <input type=range min="4" max="100" value=4 id="myRange0"
+                                   oninput="duration.value = myRange0.value">
+                            <output name="Output0" id="duration">4</output>
+                        </div>
+                        <span class="menu-collapsed">Perplexity</span>
+                        <div class="slidecontainer_perplexity">
+                            <input type="range" min="5" max="100" value="20" class="slider" id="myRange1"
+                                   oninput="perplexity_output.value = myRange1.value">
+                            <output name="Output1" id="perplexity_output">20</output>
+                        </div>
+                        <span class="menu-collapsed">Iteration</span>
+                        <div class="slidecontainer_iteration">
+                            <input type="range" min="100" max="5000" value="100" class="slider" id="myRange2"
+                                   oninput="iteration_output.value = myRange2.value">
+                            <output name="Output2" id="iteration_output">100</output>
+                        </div>
+                    </div>
+                        <a href="#submenu2" data-toggle="collapse" aria-expanded="false" class="bg-light list-group-item list-group-item-action flex-column align-items-start">
+                            <div class="d-flex w-100 justify-content-start align-items-center">
+                                <span class="fa fa-soundcloud fa-fw mr-3"></span>
+                                <span class="menu-collapsed">Meyda Setting</span>
+                                <span class="submenu-icon ml-auto"></span>
+                            </div>
+                        </a>
+                        <!-- Submenu content -->
+                        <div id='submenu2' class="collapse sidebar-submenu">
+                            <a href="#" class="list-group-item list-group-item-action bg-dark text-white">
+                                <span class="menu-collapsed">Sample Rate</span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="basic-addon0">Value:</span>
+                                    </div>
+                                    <input type="number" id="samplerate"  class="form-control" value="44100" aria-label="44100" aria-describedby="basic-addon0">
+                                </div>
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action bg-dark text-white">
+                                <span class="menu-collapsed">Window Size</span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="basic-addon1">Value:</span>
+                                    </div>
+                                    <input type="number"id="windowsize" class="form-control" value="4096" aria-label="4096" aria-describedby="basic-addon1">
+                                </div>
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action bg-dark text-white">
+                                <span class="menu-collapsed">Hop Size</span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="basic-addon2">Value:</span>
+                                    </div>
+                                    <input type="number" id="hopsize"  class="form-control" value="2048" aria-label="2048" aria-describedby="basic-addon2">
+                                </div>
+                            </a>
+                        </div>
 
-                <h12 style="font-family:Arial;">Audio's Duration</h12>
-                <div class="form">
-                    <input type=range min="4" max="100" value=4 id="myRange0" oninput="duration.value = myRange0.value">
-                    <output name="Output0" id="duration">4</output>
-                </div>
 
-                <h12 style="font-family:Arial;">Perplexity</h12>
-                <div class="slidecontainer_perplexity">
-                    <input type="range" min="5" max="100" value="20" class="slider" id="myRange1" oninput="perplexity_output.value = myRange1.value">
-                    <output name="Output1" id="perplexity_output">20</output>
-                </div>
-                <h12 style="font-family:Arial;">Iteration</h12>
-                <div class="slidecontainer_iteration">
 
-                    <input type="range" min="100" max="5000" value="100" class="slider" id="myRange2" oninput="iteration_output.value = myRange2.value">
-                    <output name="Output2" id="iteration_output">100</output>
-                </div>
 
+                    <!-- Separator with title -->
+                    <li class="list-group-item list-group-item-dark sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
+                        <span style="width: 85%;text-align: center">Features Extraction</span>
+                    </li>
+                    <a href="#" class="bg-light list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-start align-items-center">
+                            <span class="fa fa-anchor fa-fw mr-3"></span>
+                            <span class="menu-collapsed">Mean of 13 MFCC</span>
+                        </div>
+                    </a>
+                    <a href="#" class="bg-light list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-start align-items-center">
+                            <span class="fa fa-anchor fa-fw mr-3"></span>
+                            <span class="menu-collapsed">Standard Deviation of 13 MFCC</span>
+                        </div>
+                    </a>
+                    <a href="#" class="bg-light list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-start align-items-center">
+                            <span class="fa fa-anchor fa-fw mr-3"></span>
+                            <span class="menu-collapsed">Average Net Value of 13 MFCC</span>
+                        </div>
+                    </a>
+
+
+                    <!-- /END Separator -->
+                </ul><!-- List Group END-->
             </div>
-            </div>
+
+
+            </div><!-- sidebar-container END -->
             <div class="col-5 border bg-light">
-            <div class="card bg-light mb-3" style="max-width: 138rem;">
-                <div class="card-header" style="font-family:Arial;text-align:center">MFCC Heatmap</div>
-                <div id="live_canvas">
+                <div class="card bg-light mb-3" style="max-width: 138rem;">
+                    <div class="card-header" style="font-family:Arial;text-align:center">MFCC Heatmap</div>
+                    <div id="live_canvas">
+                    </div>
                 </div>
-            </div>
             </div>
             <div class="col-5 border bg-light" id="tooltip_all">
                 <div class="card bg-light mb-3" style="max-width: 140rem;">
-                    <div class="card-header" style="font-family:Arial;text-align:center">Euclidean Distance Comparision</div>
+                    <div class="card-header" style="font-family:Arial;text-align:center">Euclidean Distance
+                        Comparision
+                    </div>
                     <div id="Euclidean_distance"></div>
-<!--                    <div id="tooltip_line" width="500" height="300"></div>-->
-<!--                    <canvas id="tooltip_radar" width="200" height="200"></canvas>-->
-<!--                    <canvas id="tooltip_radar_compare" width="200" height="200"></canvas>-->
                 </div>
+            </div>
+            <!-- MAIN -->
+        </div>
+
+    <div class="row">
+        <div class="col-2 border bg-light">
+            <div class="card bg-light mb-3" style="max-width: 20rem; width: 100%">
+                <div class="card-header" style="font-family:Arial;text-align:center">Radar Chart</div>
+                <div id="radar_chart"></div>
+            </div>
+        </div>
+        <div class="col-10 border bg-light">
+            <div class="card bg-light mb-3" style="max-width: 280rem;">
+                <div class="card-header" style="font-family:Arial;text-align:center">TSNE Scatterplot</div>
+                <div id="theGraph" class="svg-container">
+                </div>
+                <div class="row" style="position: relative; height:300px; width:300px">
+                    <canvas id="marksChart" height="200px" width="200px"></canvas>
+                    <canvas id="myCanvas"></canvas>
                 </div>
             </div>
         </div>
 
-        <div class="row">
-<!--            <div class="col-2" id="tooltip_all">-->
-<!--                <div class="card bg-light mb-3" style="max-width: 140rem;">-->
-<!--                    <h7 class="card-header" style="font-family:Arial;text-align:center">Euclidean Distance Comparision</h7>-->
-<!--                    <div id="tooltip_line" width="500" height="300"></div>-->
-<!--                    <canvas id="tooltip_radar" width="200" height="200"></canvas>-->
-<!--                    <canvas id="tooltip_radar_compare" width="200" height="200"></canvas>-->
-<!--                </div>-->
-<!--                <div class="row" style="position: relative; height:300px; width:300px">-->
-<!--                    <canvas id="marksChart" height="200px" width="200px"></canvas>-->
-<!--                    <canvas id="myCanvas" ></canvas>-->
-<!--                </div>-->
-<!--            </div>-->
-
-            <div class="col-2 border bg-light">
-                <div class="card bg-light mb-3" style="max-width: 20rem; width: 100%">
-                    <div class="card-header" style="font-family:Arial;text-align:center">Radar Chart</div>
-                    <div id ="radar_chart"></div>
-                </div>
-            </div>
-            <div class="col-10 border bg-light" >
-                <div class="card bg-light mb-3" style="max-width: 280rem;">
-                    <div class="card-header" style="font-family:Arial;text-align:center">TSNE Scatterplot</div>
-                    <div id="theGraph" class="svg-container">
-                    </div>
-                    <div class="row" style="position: relative; height:300px; width:300px">
-                        <canvas id="marksChart" height="200px" width="200px"></canvas>
-                        <canvas id="myCanvas" ></canvas>
-                    </div>
-                </div>
-            </div>
-
-        </div>
     </div>
+</div>
 </div>
 </body>
 </html>

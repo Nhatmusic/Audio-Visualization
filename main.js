@@ -76,12 +76,8 @@ let width = window.innerWidth/3, height = window.innerHeight/3.5,
     contentHeight = height - margin.top - margin.bottom;
 
 function setup() {
-// canvas setup
-//     frameRate(30);
-    //set up heatmap canvas
-     BOX_WIDTH = 9;
-     BOX_HEIGHT = 9;
-    var live_canvas=createCanvas(windowWidth/2.2, windowHeight/3.5);
+
+    var live_canvas=createCanvas(windowWidth/2.5, windowHeight/3.5);
     live_canvas.parent('live_canvas');
     background(0)
 
@@ -89,6 +85,15 @@ function setup() {
     draw_ssm_worker = new Worker('drawssm.js');
     tsne_data_worker = new Worker('process_tsne_data.js');
     tsne_worker = new Worker('new_tsne_worker.js');
+
+    //draw color legend for heatmap
+    // select the svg area
+    var legend = d3.select("#live_canvas").append('svg').attr("width",windowWidth/2.5).attr("height",windowHeight/24);
+// Handmade legend
+    legend.append("rect").attr("x",160).attr("y",4).attr("width", 10).attr("height", 10).style("fill", "#008000")
+    legend.append("rect").attr("x",240).attr("y",4).attr("width", 10).attr("height", 10).style("fill", "#0000FF")
+    legend.append("text").attr("x",180).attr("y", 10).text(">0").style("font-size", "15px").attr("alignment-baseline","middle");
+    legend.append("text").attr("x",260).attr("y", 10).text("<0").style("font-size", "15px").attr("alignment-baseline","middle");
 
     //initiate scatter plot for tsne
     svg_scatterplot = d3.select("#theGraph")
@@ -130,6 +135,7 @@ function get_mfcc_data(a, index) {
             //find the duration of the audio in second after decoding
             var duration1 = 0;
             duration1 = source.buffer.duration;
+            console.log(duration1);
             //ignore the sound sample's duration exceeds the default setting
             if (duration1 > parseInt($('#duration').val(), 10)) {
                 fileContent.splice(index, 1)
@@ -157,7 +163,8 @@ function get_mfcc_data(a, index) {
                     'melBands': 26,
                     'sampleRate': 22050,
                     'bufferSize': windowsize,
-                    'hopSize': windowsize / (parseInt($('#duration').val(), 10) / duration1),
+                    // 'hopSize': windowsize / (parseInt($('#duration').val(), 10) / duration1),
+                    // 'hopSize': windowsize/2,
                     'numberOfMFCCCoefficients': 13,
                     'featureExtractors': [featureType, featureType2, 'amplitudeSpectrum'],
                     'callback': mfcc_extract
@@ -314,15 +321,22 @@ function all_worker_process(){
                 if (Isrecord == true) {
                     stopStream();
                     tsne_worker.terminate();
+                    fileContent = [];
+                    store_process_tsne_data.forEach(d => {
+                        audio_label.push(d.id);
+                    }
+                )
+
                 }
 
                 firstdraw = false;
-
+                // fileContent = [];
                 //Get the url of recorded file
-                audioChunks.map( d => {
-                    d = new Blob([d],{type:'audio/mpeg-3'});
-                    fileContent.push(URL.createObjectURL(d));
-                })
+
+                // audioChunks.map( d => {
+                //     d = new Blob([d],{type:'audio/webm;codecs=opus'});
+                //     fileContent.push(URL.createObjectURL(d));
+                // })
 
                 drawscatterplot(msg.value);
                 //Get Euclidean Distance Comparision
@@ -357,7 +371,7 @@ function all_worker_process(){
 function mfcc_extract(features) {
     var mfcc = features[featureType];
     var rms = features[featureType2];
-    var spectrum = features['amplitudeSpectrum'];
+    // var spectrum = features['amplitudeSpectrum'];
     //mfcc data contains all the mfcc feature extracted from sound in time series
     if (rms > 0) {
         mfcc_data.push(mfcc)
@@ -366,7 +380,7 @@ function mfcc_extract(features) {
     if(Isrecord == true & mfcc_data.length % 40 == 0 & mfcc_data.length>0){
             all_worker_process()
     }
-    console.log(spectrum);
+
 }
 
 //the function take self_similarity data as an input and then draw the self_similarity matrix
@@ -431,6 +445,8 @@ function draw() {
 }
 
 function plot(data){
+    BOX_WIDTH = windowWidth/2.5/120;
+    BOX_HEIGHT = windowHeight/3.5/28;
     for(let i = 0; i < data.length; i++ ) {
         for(let j = 0; j < data [i].length; j++ ) {
             let color_strength = data[i][j] * 100
@@ -481,19 +497,25 @@ function createMicSrcFrom(audioCtx){
                 microphone input stream */
                 let src = audioCtx.createMediaStreamSource(stream);
                 resolve(src);
-
-        const rec = new MediaRecorder(stream);
-        rec.start(1000);
-        rec.ondataavailable = e => {
-            audioChunks.push(e.data);
-            // if (rec.state == "inactive") {
-
-
-
-        }
-                // console.log(src);
+            record_music(stream);
             }).catch((err)=>{reject(err)})
     })
+
+}
+function record_music(stream){
+    const rec = new MediaRecorder(stream);
+    rec.addEventListener("dataavailable", event => {
+        audioChunks=(event.data);
+        var blob = audioChunks[0];
+        var chunk_size = blob.size;
+        var offset = chunk_size/store_process_tsne_data.length;
+        store_process_tsne_data.forEach((d,i) => {
+           var chunk = audioChunks[0].slice(offset*i,offset*(i+1));
+            chunk = new Blob([chunk],{type:'audio/webm;codecs=opus'});
+            fileContent.push(URL.createObjectURL(chunk));
+            d.url = fileContent[i]
+        })
+    });
 
 }
 
@@ -509,16 +531,17 @@ function stopStream() {
 function onMicDataCall(features, callback){
     return new Promise((resolve, reject)=>{
         var audioCtx = new AudioContext();
+        var windowsize = 1024;
         createMicSrcFrom(audioCtx)
             .then((src) => {
                 // console.log(audioCtx.createBufferSource());
                 analyzer = Meyda.createMeydaAnalyzer({
                     'audioContext': audioCtx,
                     'source':src,
-                    'bufferSize':1024,
+                    'bufferSize':windowsize,
                     'melBands': 26,
-                    'sampleRate': 44100,
-                    'hopSize': 1024,
+                    'sampleRate': 22050,
+                    'hopSize': windowsize/2,
                     'featureExtractors':features,
                     'callback':callback
                 })
@@ -539,8 +562,8 @@ function startrecord() {
         }).catch((err)=>{
         alert(err)
     })
-
 }
+
 function windowResized() {
     resizeCanvas(windowWidth/2.5, windowHeight/3.5);
     // canvas.position(windowWidth/4, windowHeight/4);
@@ -711,7 +734,7 @@ function draw_euclidean_line_chart(dataset){
         text: dataset.label_array,
         marker: {
             color: 'rgb(219, 64, 82)',
-            size: 12,
+            size: 5,
             line: {
                 color: 'black',
                 width: 0.5
@@ -722,12 +745,13 @@ function draw_euclidean_line_chart(dataset){
 
     var layout = {
         width: windowWidth/2.2,
-        height: windowHeight/3.5
+        height: windowHeight/3.5,
+        autosize: true
     };
 
     var data = trace1;
-
-    Plotly.newPlot('Euclidean_distance', [data], layout);
+    var config = {responsive: true};
+    Plotly.newPlot('Euclidean_distance', [data], layout, config);
 }
 
 function draw_radar_chart_comparision(dataset){
@@ -769,14 +793,14 @@ function draw_radar_chart_comparision(dataset){
         },
         showlegend: true,
         legend: {
-            x: 1,
-            xanchor: 'right',
-            y: 1
+            x: 0.5,
+            xanchor: 'center',
+            y: 1.1
         },
-        width: 330,
+        width: 350,
         autosize: true
     }
-
-    Plotly.newPlot("radar_chart", data, layout)
+    var config = {responsive: true}
+    Plotly.newPlot("radar_chart", data, layout, config);
 
 }

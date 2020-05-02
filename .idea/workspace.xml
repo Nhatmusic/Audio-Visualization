@@ -3,9 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="497b5d7f-4cea-4f0d-8663-c707659d5d93" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/js/meyda.min.js" beforeDir="false" afterPath="$PROJECT_DIR$/assets/js/meyda.min.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/js/tSNE_Scatterplot.js" beforeDir="false" afterPath="$PROJECT_DIR$/assets/js/tSNE_Scatterplot.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/js/tsnePlot.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
     </list>
@@ -37,7 +35,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Desktop/Hi TTCU Member! Thanks for signing up..html" />
   </component>
   <component name="ServiceViewManager">
     <option name="viewStates">
@@ -114,7 +112,16 @@
       <workItem from="1587513331523" duration="9354000" />
       <workItem from="1587692824210" duration="8072000" />
       <workItem from="1587746941581" duration="1285000" />
-      <workItem from="1587870053574" duration="21900000" />
+      <workItem from="1587870053574" duration="34138000" />
+      <workItem from="1588016031379" duration="2389000" />
+      <workItem from="1588081290489" duration="597000" />
+      <workItem from="1588127088693" duration="4359000" />
+      <workItem from="1588186003527" duration="772000" />
+      <workItem from="1588213690027" duration="600000" />
+      <workItem from="1588217840729" duration="5397000" />
+      <workItem from="1588280735326" duration="1377000" />
+      <workItem from="1588301265242" duration="2078000" />
+      <workItem from="1588389988991" duration="1074000" />
     </task>
     <servers />
   </component>
@@ -126,11 +133,11 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="1023" y="511" key="#com.intellij.fileTypes.FileTypeChooser/0.0.2560.1400@0.0.2560.1400" timestamp="1581700498820" />
-    <state x="688" y="217" key="FileChooserDialogImpl" timestamp="1587878042945">
+    <state x="688" y="217" key="FileChooserDialogImpl" timestamp="1588281593355">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="550" y="172" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1583619537581" />
-    <state x="688" y="217" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1587878042945" />
+    <state x="688" y="217" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1588281593355" />
     <state x="917" y="292" key="FileChooserDialogImpl/0.0.2560.1400@0.0.2560.1400" timestamp="1582037854492" />
     <state x="539" y="183" width="840" height="856" key="search.everywhere.popup" timestamp="1587527768819">
       <screen x="0" y="0" width="1920" height="1040" />

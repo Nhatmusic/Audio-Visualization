@@ -14,6 +14,7 @@ function PlayAudio(thisElement, d) {
         audioElement.play();
     }
     else {
+
         // Get saved audio element
         audioElement = thisElement.getElementsByTagName("audio")[0];
         if (audioElement.isPlaying()) {
@@ -103,7 +104,8 @@ function Update_Tsne_node(data) {
                 d3.select(this)
                     .attr("width", 50)
                     .attr("height", 50);
-                d3.selectAll('text').style("opacity",0);
+
+                scatterplot.selectAll('text').style("opacity",0);
 
                 scatterplot.selectAll("path")
                     .style('stroke-width', function(d) {
@@ -112,7 +114,7 @@ function Update_Tsne_node(data) {
                         .style('opacity', function(d) {
                             return (d[0].id == active_value || d[1].id == active_value ? 0.5: 1)
                         })
-                d3.select(".text"+ d.id).style("font-size", "20px").style("opacity",1);
+                scatterplot.select(".text"+ d.id).style("font-size", "20px").style("opacity",1);
                 draw_euclidean_line_chart(d);
                 draw_radar_chart_comparision(d);
 

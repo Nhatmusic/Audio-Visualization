@@ -7,9 +7,10 @@ let mfcc_data_all = [];
 let draw_ssm_worker;
 let tsne_worker;
 let tsne_data_worker;
+let feature_selection = "t";
 let store_process_tsne_data = [];
 let empty = [];
-//minimum spanning trê
+//minimum spanning tree
 let selected_node = false;
 let start_node_id;
 let end_node_id;
@@ -29,10 +30,11 @@ let tsne_config = {
 
     }
 };
+//Machine Learning
+let model;
+let state = 'collection';
 
-//set up heatmap canvas
-// var BOX_WIDTH = windowWidth/2.5/30;
-// var BOX_HEIGHT = windowHeight/3.5/13;
+
 var heatmap_max_length = 27;
 
 //get file directory
@@ -111,9 +113,69 @@ function setup() {
         .append("g")
         .attr("transform", `translate(${150}, ${50})`)
         .attr("id", "snodes");
+
+    //Do Machine Learning test
+    let store_feature = Array.from(Array(39), (x, index) => index.toString())
+    let options = {
+        inputs: store_feature,
+        outputs: ['label'],
+        task: 'classification',
+        debug: 'true'
+    };
+    model = ml5.neuralNetwork(options);
 }
 
+function traindata() {
+    state = 'training';
+    console.log('starting training');
+    model.normalizeData();
+    let options = {
+        epochs: 300
+    }
+    model.train(options, whileTraining, finishedTraining);
 
+
+}
+
+function whileTraining(epoch, loss) {
+    console.log(epoch);
+}
+
+function finishedTraining() {
+    $.notify("Training Data Completed!", "success");
+    console.log('finished training.');
+    state = 'prediction';
+}
+
+function AddData() {
+    var inputs = {};
+    var target = {};
+
+    store_process_tsne_data.forEach((d) => {
+        var inputs = {};
+        var target = {};
+        for (i = 0; i < d.length; i++) {
+            var name = i;
+            inputs[name] = d[i];
+            target = {
+                label: d.label
+            }
+
+        }
+        model.addData(inputs, target);
+    })
+    $.notify("Add Data Completed!", "success");
+}
+function predict(inputs){
+    model.classify(inputs, gotResults);
+}
+function gotResults(error, results) {
+    if (error) {
+        console.error(error);
+        return;
+    }
+    console.log(results);
+}
 function get_mfcc_data(a, index) {
 
     //Create audioContext to decode the audio data later
@@ -205,6 +267,18 @@ function get_mfcc_data(a, index) {
     return 0;
 }
 
+function selectfeature(value) {
+    feature_selection = value;
+    //reset
+    store_process_tsne_data = [];
+    tsne_data_worker.postMessage({
+        data: mfcc_data_all,
+        select_feature: feature_selection,
+        control: 'rerun'
+    })
+
+}
+
 function all_worker_process() {
     var store_each_sound_mfcc = [];
     //mfcc_data is generated from function show1 of Meyda Analyzer 1 of each sound samples
@@ -216,7 +290,9 @@ function all_worker_process() {
         data: store_each_sound_mfcc
     });
     tsne_data_worker.postMessage({
-        data: store_each_sound_mfcc
+        data: store_each_sound_mfcc,
+        select_feature: feature_selection,
+        control: 'normal'
     })
     draw_ssm_worker.onmessage = function (e) {
         var msg = e.data;
@@ -257,6 +333,11 @@ function all_worker_process() {
                         message: 'DataReady',
                     });
                 }
+                break;
+            case 'FEATURES':
+                // tsne_worker.terminate();
+                store_process_tsne_data = (msg.value);
+                tsne_worker.postMessage({message: 'features', data: store_process_tsne_data, value: tsne_config.opt});
                 break;
             default:
                 break;
@@ -314,6 +395,38 @@ function all_worker_process() {
                         .attr("y", d => (yScale(d.y)));
                 }
                 break;
+            case 'DrawUpdateFeature':
+                UpdateDataTSNE(msg.value);
+                console.log("drawing" + "" + msg.value.length);
+                xScale = d3.scaleLinear()
+                    .domain(d3.extent(msg.value.flat()))
+                    .range([0, contentWidth]);
+                yScale = d3.scaleLinear()
+                    .domain(d3.extent(msg.value.flat()))
+                    .range([0, contentHeight]);
+                scatterplot.selectAll("text").data(store_process_tsne_data)
+                    .attr("x", d => (xScale(d.x)))
+                    .attr("y", d => (yScale(d.y)));
+                scatterplot.selectAll(".imagee").data(store_process_tsne_data)
+                    .attr("x", d => (xScale(d.x)))
+                    .attr("y", d => (yScale(d.y)));
+                store_process_tsne_data.forEach(d => {
+                    var store_distance = [];
+                    var store_label = [];
+                    var id_array = [];
+                    store_process_tsne_data.forEach(dataarray => {
+                        if (d.id != dataarray.id) {
+                            store_distance.push(euclideanDistance(dataarray, d))
+                            store_label.push(dataarray.label);
+                            id_array.push(dataarray.id);
+                        }
+                    })
+                    d.distance_array = store_distance;
+                    d.label_array = store_label;
+                    d.id_array = id_array;
+                });
+
+                break;
             case 'Done':
                 if (Isrecord == true) {
                     stopStream();
@@ -327,14 +440,6 @@ function all_worker_process() {
                 }
 
                 firstdraw = false;
-                // fileContent = [];
-                //Get the url of recorded file
-
-                // audioChunks.map( d => {
-                //     d = new Blob([d],{type:'audio/webm;codecs=opus'});
-                //     fileContent.push(URL.createObjectURL(d));
-                // })
-
                 drawscatterplot(msg.value);
                 //Get Euclidean Distance Comparision
                 store_process_tsne_data.forEach(d => {

@@ -4,6 +4,7 @@ importScripts('./assets/js/tsne_new.js');
 //assign control variable called firstRun
 //define first instance of tsne
 let tsne;
+let tsne_feature;
 // var isUpdate = false;
 let store_tsne_solution;
 let index;
@@ -126,8 +127,22 @@ self.onmessage = function (e) {
                     value: store_tsne_solution,
                     index: store_tsne_solution.length
                 });
-
+            break;
+        case 'features':
+            // tsne_feature = new tsnejs.tSNE(msg.value);
+            tsne.initDataRaw(msg.data);
+            for (let i = 0; i < 1000; i++)
+            {
+                tsne.step();
+                step_tsne = tsne.getSolution();
+                postMessage({
+                    message: 'DrawUpdateFeature',
+                    value: step_tsne
+                });
+            }
+            break;
         default:
+            break;
 
     }
 };

@@ -120,6 +120,14 @@ function Update_Tsne_node(data) {
 
             })
              .on("click", function (d){
+                 if (state == 'prediction'){
+                     var inputs = {};
+                     for (i = 0; i < d.length; i++) {
+                         var name = i;
+                         inputs[name] = d[i];
+                     }
+                     predict(inputs,gotResults);
+                 }
                  if (selected_node==false){
                      minimumSpanningTree.nodes[d.id].start=true;
                      start_node_id=d.id

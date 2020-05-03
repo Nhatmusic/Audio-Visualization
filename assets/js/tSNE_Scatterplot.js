@@ -1,4 +1,123 @@
 
+function traindata() {
+    state = 'training';
+    console.log('starting training');
+    model.normalizeData();
+    let options = {
+        epochs: parseInt($('#epoch').val(), 10),
+        learningRate: parseFloat($('#learningrate').val(), 10),
+        batchSize: parseInt($('#batchsize').val(), 10)
+    }
+    // let mlresult;
+    model.train(options, whileTraining, finishedTraining);
+
+
+}
+
+function whileTraining(epoch, loss) {
+    console.log(epoch);
+}
+
+function finishedTraining() {
+    $.notify("Training Data Completed!", "success");
+    console.log('finished training.');
+    state = 'prediction';
+}
+
+function AddData() {
+    wsTooltipContainer = d3.select('body').append("div")
+        .attr('id', "wsTooltipContainer");
+
+    wsTooltipDiv = wsTooltipContainer.append("div")
+        .attr("class", "wsTooltip")
+        .attr("id", "wsTooltip")
+        .style("visibility", "hidden")
+        ;
+    columns = ["label", "confidence"];
+    var inputs = {};
+    var target = {};
+
+    store_process_tsne_data.forEach((d) => {
+        var inputs = {};
+        var target = {};
+        for (i = 0; i < d.length; i++) {
+            var name = i;
+            inputs[name] = d[i];
+            target = {
+                label: d.label
+            }
+
+        }
+        model.addData(inputs, target);
+    })
+    $.notify("Add Data Completed!", "success");
+}
+function predict(inputs){
+model.classify(inputs,gotResults)
+    .then(result => {
+        console.log(result);
+        mlresult =result;
+        createTableTooltip(wsTooltipDiv, result)
+})
+}
+
+function gotResults(error,results) {
+    if (error) {
+        console.log(error);
+        return;
+    }
+    // console.log(results);
+}
+function turnoff(){
+    state = "collecting";
+}
+function createTableTooltip(wsTooltipDiv, info) {
+    // process info text
+    wsTooltipDiv.selectAll("*").remove();
+    let table = wsTooltipDiv.append("table")
+            .attr("class", "tableTooltip")
+            .attr("id", "tableTooltip")
+            .style("width", "100%"),
+        thead = table.append("thead"),
+        tbody = table.append("tbody");
+
+    // header row
+    thead.append("tr")
+        .selectAll("th")
+        .data(columns)
+        .enter()
+        .append("th")
+        .attr("class", column => "column-" + column)
+        .text(column => capitalize(column));
+
+    // create a row for each record
+    let rows = tbody.selectAll("tr")
+        .data(info.slice(0,5))
+        .enter()
+        .append("tr");
+
+
+    let cells = rows.selectAll("td")
+        .data(function (row) {
+            return columns.map(function (column) {
+                return {column: column, value: row[column]}
+            })
+        })
+        .enter()
+        .append("td")
+        .style("color", "#808080")
+        .html(function (d) {
+            if (d.column == "label"){
+                return d.value;
+            }
+            else if (d.column == "confidence") {
+                return d.value.toFixed(2);
+            }
+
+        })
+    ;
+}
+
 function PlayAudio(thisElement, d) {
     // Play audio on click
     let audioElement;
@@ -126,22 +245,28 @@ function Update_Tsne_node(data) {
                          var name = i;
                          inputs[name] = d[i];
                      }
+                     wsTooltipDiv.style("visibility","visible").style("top", (d3.event.pageY - 200) + "px").style("left", d3.event.pageX + "px");
+
                      predict(inputs,gotResults);
                  }
-                 if (selected_node==false){
-                     minimumSpanningTree.nodes[d.id].start=true;
-                     start_node_id=d.id
-                     $.notify("Start Node Selected", "success");
-                     selected_node=true;
-                 }
                  else {
-                     minimumSpanningTree.nodes[d.id].end=true;
-                     $.notify("End Node Selected", "success");
-                     end_node_id=d.id;
-                     selected_node=false;
+                     if (selected_node == false) {
+                         minimumSpanningTree.nodes[d.id].start = true;
+                         start_node_id = d.id
+                         $.notify("Start Node Selected", "success");
+                         selected_node = true;
+                     } else {
+                         minimumSpanningTree.nodes[d.id].end = true;
+                         $.notify("End Node Selected", "success");
+                         end_node_id = d.id;
+                         selected_node = false;
+                     }
                  }
              })
             .on('mouseout', function (d) {
+                if (state == 'prediction') {
+                    wsTooltipDiv.style("visibility", "hidden");
+                }
                 d3.select(this)
                     .attr("width", 10)
                     .attr("height", 10)
@@ -228,4 +353,7 @@ function UpdateDataTSNE(data) {
             store_process_tsne_data[i].id = i;
             store_process_tsne_data[i].label = audio_label[i];
     });
+}
+function capitalize(string){
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }

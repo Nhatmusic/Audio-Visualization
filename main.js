@@ -45,7 +45,7 @@ window.onload = function () {
         let files = event.target.files;
         // console.log(files);
         for (i = 0; i < files.length; i++) {
-            audio_label.push(files[i].name.split('_').slice(0, 2).join("_"));
+            audio_label.push(files[i].name.split('_').slice(0, 2).slice(0,1).join("_"));
             // audio_label.push(files[i].name);
             fileContent.push(URL.createObjectURL(files[i]));
             fakeDataforfirstplot.push([0]);
@@ -123,59 +123,11 @@ function setup() {
         debug: 'true'
     };
     model = ml5.neuralNetwork(options);
-}
-
-function traindata() {
-    state = 'training';
-    console.log('starting training');
-    model.normalizeData();
-    let options = {
-        epochs: 300
-    }
-    model.train(options, whileTraining, finishedTraining);
 
 
 }
 
-function whileTraining(epoch, loss) {
-    console.log(epoch);
-}
 
-function finishedTraining() {
-    $.notify("Training Data Completed!", "success");
-    console.log('finished training.');
-    state = 'prediction';
-}
-
-function AddData() {
-    var inputs = {};
-    var target = {};
-
-    store_process_tsne_data.forEach((d) => {
-        var inputs = {};
-        var target = {};
-        for (i = 0; i < d.length; i++) {
-            var name = i;
-            inputs[name] = d[i];
-            target = {
-                label: d.label
-            }
-
-        }
-        model.addData(inputs, target);
-    })
-    $.notify("Add Data Completed!", "success");
-}
-function predict(inputs){
-    model.classify(inputs, gotResults);
-}
-function gotResults(error, results) {
-    if (error) {
-        console.error(error);
-        return;
-    }
-    console.log(results);
-}
 function get_mfcc_data(a, index) {
 
     //Create audioContext to decode the audio data later
@@ -396,6 +348,7 @@ function all_worker_process() {
                 }
                 break;
             case 'DrawUpdateFeature':
+                scatterplot.selectAll("path").remove()
                 UpdateDataTSNE(msg.value);
                 console.log("drawing" + "" + msg.value.length);
                 xScale = d3.scaleLinear()

@@ -45,8 +45,8 @@ window.onload = function () {
         let files = event.target.files;
         // console.log(files);
         for (i = 0; i < files.length; i++) {
-            audio_label.push(files[i].name.split('_').slice(0, 2).slice(0,1).join("_"));
-            // audio_label.push(files[i].name);
+            // audio_label.push(files[i].name.split('_').slice(0, 2).slice(0, 1).join("_"));
+            audio_label.push(files[i].name);
             fileContent.push(URL.createObjectURL(files[i]));
             fakeDataforfirstplot.push([0]);
         }
@@ -77,10 +77,13 @@ let width = window.innerWidth / 3, height = window.innerHeight / 3.5,
     contentWidth = width - margin.left - margin.right,
     contentHeight = height - margin.top - margin.bottom;
 
+
 function setup() {
 
-
-    var live_canvas = createCanvas(windowWidth / 2.5, windowHeight / 3.5);
+    canvas_width = windowWidth / 2.5, canvas_height = windowHeight / 4.5;
+    BOX_WIDTH = canvas_width / 120;
+    BOX_HEIGHT = canvas_height / 28;
+    var live_canvas = createCanvas(canvas_width, canvas_height);
     live_canvas.parent('live_canvas');
     background(0)
 
@@ -89,14 +92,53 @@ function setup() {
     tsne_data_worker = new Worker('process_tsne_data.js');
     tsne_worker = new Worker('new_tsne_worker.js');
 
+
     //draw color legend for heatmap
+    domain_heatmap = [-1, 1, 50, 100, 150, 200, 250, 300];
+    generator_heatmap = d3.scaleLinear()
+        .domain([0, 1, 2, 3, 4, 5, 6, 7])
+        .range([
+            d3.rgb(220, 220, 220), d3.rgb(0, 156, 255), d3.rgb(0, 255, 164), d3.rgb(63, 255, 0), d3.rgb(214, 245, 0), d3.rgb(255, 166, 0), d3.rgb(255, 97, 0), d3.rgb(200, 65, 65)]
+        )
+        .interpolate(d3.interpolateCubehelix)
+    range_heatmap = d3.range(domain_heatmap.length).map(generator_heatmap);
+    quantile_heatmap = d3.scaleQuantile()
+        .domain(domain_heatmap)
+        .range(range_heatmap);
+    column("d3.scaleQuantile", quantile_heatmap);
+
+    function column(title, scale) {
+        var legend = d3.legendColor()
+            .labelFormat(d3.format(",.0f"))
+            .cells(5)
+            .orient('horizontal')
+            .labelAlign("start")
+            .shapeWidth(65)
+            .labelWrap(30)
+            .scale(scale);
+
+        var div = d3.select("body").append("div")
+            .attr("class", "row");
+
+        div.append("h4").text(title);
+
+        var legend_heat = d3.select("#live_canvas").append('svg').attr("width", windowWidth / 2.5).attr("height", windowHeight / 24);
+
+        legend_heat.append("g")
+            .attr("class", "legendQuant")
+            .attr("transform", "translate(10,0)");
+
+        legend_heat.select(".legendQuant")
+            .call(legend);
+    };
+
     // select the svg area
-    var legend = d3.select("#live_canvas").append('svg').attr("width", windowWidth / 2.5).attr("height", windowHeight / 24);
-// Handmade legend
-    legend.append("rect").attr("x", 160).attr("y", 4).attr("width", 10).attr("height", 10).style("fill", "#008000")
-    legend.append("rect").attr("x", 240).attr("y", 4).attr("width", 10).attr("height", 10).style("fill", "#0000FF")
-    legend.append("text").attr("x", 180).attr("y", 10).text(">0").style("font-size", "15px").attr("alignment-baseline", "middle");
-    legend.append("text").attr("x", 260).attr("y", 10).text("<0").style("font-size", "15px").attr("alignment-baseline", "middle");
+//     var legend = d3.select("#live_canvas").append('svg').attr("width", windowWidth / 2.5).attr("height", windowHeight / 24);
+// // Handmade legend
+//     legend.append("rect").attr("x", 160).attr("y", 4).attr("width", 10).attr("height", 10).style("fill", "#008000")
+//     legend.append("rect").attr("x", 240).attr("y", 4).attr("width", 10).attr("height", 10).style("fill", "#0000FF")
+//     legend.append("text").attr("x", 180).attr("y", 10).text(">0").style("font-size", "15px").attr("alignment-baseline", "middle");
+//     legend.append("text").attr("x", 260).attr("y", 10).text("<0").style("font-size", "15px").attr("alignment-baseline", "middle");
 
     //initiate scatter plot for tsne
     svg_scatterplot = d3.select("#theGraph")
@@ -276,7 +318,7 @@ function all_worker_process() {
             case 'READY':
                 // console.log('tsne_data_worker is ready');
                 store_process_tsne_data.push(msg.value);
-                console.log("process" + "" + store_process_tsne_data.length);
+                // console.log("process" + "" + store_process_tsne_data.length);
                 if (store_process_tsne_data.length == 2) {
                     tsne_worker.postMessage({message: 'initTSNE', value: tsne_config.opt});
                 }
@@ -326,7 +368,7 @@ function all_worker_process() {
                 break;
             case 'DrawUpdate':
                 UpdateDataTSNE(msg.value);
-                console.log("drawing" + "" + msg.value.length);
+                // console.log("drawing" + "" + msg.value.length);
                 xScale = d3.scaleLinear()
                     .domain(d3.extent(msg.value.flat()))
                     .range([0, contentWidth]);
@@ -348,9 +390,10 @@ function all_worker_process() {
                 }
                 break;
             case 'DrawUpdateFeature':
+                svg_scatterplot.selectAll("image").style("opacity",1);
                 scatterplot.selectAll("path").remove()
                 UpdateDataTSNE(msg.value);
-                console.log("drawing" + "" + msg.value.length);
+                // console.log("drawing" + "" + msg.value.length);
                 xScale = d3.scaleLinear()
                     .domain(d3.extent(msg.value.flat()))
                     .range([0, contentWidth]);
@@ -499,17 +542,16 @@ function draw() {
 }
 
 function plot(data) {
-    BOX_WIDTH = windowWidth / 2.5 / 120;
-    BOX_HEIGHT = windowHeight / 3.5 / 28;
     for (let i = 0; i < data.length; i++) {
         for (let j = 0; j < data [i].length; j++) {
-            let color_strength = data[i][j] * 100
-
+            let color_strength = quantile_heatmap(data[i][j]).replace("rgb", "").replace("(", "").replace(")", "").split(',')
+            // let color_strength = data[i][j]*100
             // setting color
-            if (data [i] [j] >= 0)
-                fill(0, color_strength, 0)
+            if (data[i][j] >= 0)
+                fill(parseInt(color_strength[0]), parseInt(color_strength[1]), parseInt(color_strength[2]))
+            // fill(0,color_strength,0)
             else
-                fill(0, 0, -color_strength)
+                fill(209)
             // noStroke();
             //drawing the rectangle
             rect(i * BOX_WIDTH * 2, j * BOX_HEIGHT * 2, BOX_WIDTH * 2, BOX_HEIGHT * 2)

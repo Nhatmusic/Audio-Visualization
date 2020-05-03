@@ -207,13 +207,12 @@ function Update_Tsne_node(data) {
                 noLoop();
                 for(let i = 0; i < mfcc_data_all[d.id].length; i++ ) {
                     for (let j = 0; j < mfcc_data_all[d.id][i].length; j++) {
-                        let color_strength = mfcc_data_all[d.id][i][j] * 100
-
+                        let color_strength = quantile_heatmap(mfcc_data_all[d.id][i][j]).replace("rgb","").replace("(","").replace(")","").split(',')
                         // setting color
                         if (mfcc_data_all[d.id] [i] [j] >= 0)
-                            fill(0, color_strength, 0)
+                            fill(parseInt(color_strength[0]),parseInt(color_strength[1]),parseInt(color_strength[2]))
                         else
-                            fill(0, 0, -color_strength)
+                            fill(209)
                         // noStroke();
                         //drawing the rectangle
                         rect(i * BOX_WIDTH * 2, j * BOX_HEIGHT * 2, BOX_WIDTH * 2, BOX_HEIGHT * 2)
